@@ -5,8 +5,7 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
-//#include <allegro5/allegro_native_dialog.h>
-//#include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_primitives.h>
 
 #define FPS 60.0
 #define windowWidth 800
@@ -17,30 +16,36 @@
 #define projectileAccel 0.25
 #define projectileOffset 10
 #define projectileMax 3
+#define projectileDamage 10
+#define targetPracticeLife 20
+#define SODIUM_STATIC
 
 // Helkson
-#define Up 0
-#define Left 1
-#define Right 2
-#define gravity 0.1
+#define Left 0
+#define Right 1
+#define gravity 0.275
 
 struct sprite {
 	// Felipe
 	ALLEGRO_BITMAP *spriteBitmap;
 	float x, y;
 	float x0, y0;
-	float xLenght, yLenght;
+	float width, height;
 	float speed, accel;
+	float life;
+	int hitboxWidth, hitboxHeight;
 	int spriteChange;
+	int damage;
 	bool isShooting;
+	bool jump;
+	bool alive;
 	bool projectileTravel;
+	bool projectileHit;
 
 	//Helkson
 	int dir;
-	int vel_x;
-	int vel_y;
-	int vel_max;
-	int limite;
+	float vel_x;
+	float vel_y;
 };
 
 ALLEGRO_DISPLAY * display = NULL;
@@ -49,15 +54,17 @@ ALLEGRO_TIMER * timer = NULL;
 ALLEGRO_EVENT_QUEUE * queue = NULL;
 struct sprite player;
 struct sprite projectile[projectileMax];
-
+struct sprite enemy;
 
 int initialize() {
+
+	sodium_init();
 
 	al_init();
 	al_init_image_addon();
 	al_init_font_addon();
 	al_init_ttf_addon();
-	//al_init_primitives_addon();
+	al_init_primitives_addon();
 
 	timer = al_create_timer(1.0 / FPS);
 	display = al_create_display(windowWidth, windowHeight);
@@ -88,15 +95,34 @@ int initplayer(struct sprite *c) {
 
 	c->x = 100;
 	c->y = 500;
-	c->xLenght = 68;
-	c->yLenght = 45;
+	c->vel_x = 7;
+	c->vel_y = 0;
+	c->hitboxWidth = 68;
+	c->hitboxHeight = 45;
 	c->vel_x = 3;
 	c->vel_y = 3;
-	c->limite = 600;
 	c->dir = 5;
+	c->jump = false;
 
 	return 0;
 }
+
+int initenemy(struct sprite *e) {
+	e->spriteBitmap = al_load_bitmap("Img/miniufo.bmp");
+
+	e->x = 550 + randombytes_uniform(201);
+	e->y = 400 + randombytes_uniform(101);
+	e->life = targetPracticeLife;
+
+	e->width = 44;
+	e->height = 38;
+
+	e->hitboxWidth = 44;
+	e->hitboxHeight = 38;
+
+	return 0;
+}
+
 
 void actShoot(struct sprite *p, struct sprite *c, int n) {
 	p->spriteBitmap = al_load_bitmap("Img/tiro.bmp");
@@ -105,7 +131,13 @@ void actShoot(struct sprite *p, struct sprite *c, int n) {
 	p->speed = projectileVelocity;
 	p->accel = projectileAccel;
 
-	p->x0 = c->x + c->xLenght;
+	p->width = 46;
+	p->height = 22;
+
+	p->hitboxWidth = 46;
+	p->hitboxHeight = 22;
+
+	p->x0 = c->x + c->hitboxWidth;
 	p->y0 = c->y + projectileOffset;
 	p->x = p->x0;
 	p->y = p->y0;
@@ -125,7 +157,7 @@ int refreshProjectileState(struct sprite p[], int i, int n) {
 				p[j].speed += p[j].accel;
 			}
 
-			if (p[j].x - p[j].x0 < 400) {
+			if (p[j].x - p[j].x0 < windowWidth) {
 				p[j].x += p[j].speed;
 			}
 			else {
@@ -143,12 +175,52 @@ int refreshProjectileState(struct sprite p[], int i, int n) {
 	}
 }
 
+void createTarget(struct sprite *e) {
+	e->x = 550 + randombytes_uniform(201);
+	e->y = 400 + randombytes_uniform(101);
+	e->life = targetPracticeLife;
+}
+
+int hitboxDetection(struct sprite *a, struct sprite b) {
+	float xAxisPivotA, yAxisPivotA, xAxisPivotB, yAxisPivotB, rightA, leftA, downA, upA, rightB, leftB, downB, upB;
+	int i, hitCount = 0;
+
+	for (i = 0; i < projectileMax; i++) {
+		xAxisPivotA = a[i].x + a[i].width / 2;
+		yAxisPivotA = a[i].y + a[i].height / 2;
+		xAxisPivotB = b.x + b.width / 2;
+		yAxisPivotB = b.y + b.height / 2;
+
+		rightA = xAxisPivotA + a[i].hitboxWidth / 2;
+		leftA = xAxisPivotA - a[i].hitboxWidth / 2;
+		downA = yAxisPivotA + a[i].hitboxHeight / 2;
+		upA = yAxisPivotA - a[i].hitboxHeight / 2;
+
+		rightB = xAxisPivotB + b.hitboxWidth / 2;
+		leftB = xAxisPivotB - b.hitboxWidth / 2;
+		downB = yAxisPivotB + b.hitboxHeight / 2;
+		upB = yAxisPivotB - b.hitboxHeight / 2;
+
+		if ((rightA > leftB && rightA < rightB) || (leftA > leftB && leftA < rightB)) {
+			if ((upA < downB && upA > upB) || (downA > upB && downA < downB)) {
+				a[i].projectileTravel = false;
+				a[i].x = 0;
+				a[i].y = 0;
+				hitCount++;
+			}
+		}
+	}
+
+	return hitCount;
+}
+
 int main() {
-	int i, projectileCount = 0, lastProjectileI = -1, keyPress = 0;
+	int i, projectileCount = 0, hit = 0, lastProjectileI = -1, keyPress = 0;
 	bool gameLoop = true;
 
 	initialize();
 	initplayer(&player);
+	initenemy(&enemy);
 
 	al_clear_to_color(al_map_rgb(255, 255, 255));
 
@@ -156,11 +228,6 @@ int main() {
 		ALLEGRO_EVENT event;
 		al_wait_for_event(queue, &event);
 
-		/*while (player.y > player.limite)
-		{
-			player.vel_y = player.vel_y - gravity;
-			player.y += player.vel_y;
-		}*/
 
 		if (event.type == ALLEGRO_EVENT_TIMER) {
 			if (player.isShooting) {
@@ -174,17 +241,49 @@ int main() {
 
 			projectileCount = projectileCount - refreshProjectileState(projectile, lastProjectileI, projectileCount);
 
+			hit = hitboxDetection(projectile, enemy);
+
+			projectileCount = projectileCount - hit;
+
+			if (hit > 0) {
+				enemy.life -= projectileDamage;
+
+				if (enemy.life <= 0) {
+					createTarget(&enemy);
+				}
+
+				hit = 0;
+			}
+
 			switch (player.dir)
 			{
-			case Up:
-				player.y -= player.vel_y;
-				break;
 			case Right:
-				player.x += player.vel_x;
+				if (player.x > 0) {
+					player.x += player.vel_x;
+				}
 				break;
 			case Left:
-				player.x -= player.vel_x;
+				if (player.x < 732) {
+					player.x -= player.vel_x;
+				}
 				break;
+			}
+
+			if (player.y >= 500) {
+				player.y = 500;
+				player.jump = false;
+			}
+			else {
+				player.vel_y += gravity;
+				player.y += player.vel_y;
+			}
+
+			if (player.x <= 0) {
+				player.x = 1;
+			}
+
+			if (player.x >= 732) {
+				player.x = 731;
 			}
 
 			al_flip_display();
@@ -193,9 +292,12 @@ int main() {
 		if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
 			switch (event.keyboard.keycode) {
 			case ALLEGRO_KEY_UP:
-				player.dir = Up;
+				if (!player.jump) {
+					player.vel_y = -7;
+					player.y--;
+					player.jump = true;
+				}
 				break;
-
 			case ALLEGRO_KEY_LEFT:
 				player.dir = Left;
 				break;
@@ -214,8 +316,22 @@ int main() {
 				break;
 			}
 			
- 			if (event.type == ALLEGRO_EVENT_KEY_UP) {
-				player.dir = 5;
+			
+		}
+
+		if (event.type == ALLEGRO_EVENT_KEY_UP)
+		{
+			switch (event.keyboard.keycode) {
+			case ALLEGRO_KEY_RIGHT:
+				if (player.dir == Right) {
+					player.dir = 5;
+				}
+				break;
+			case ALLEGRO_KEY_LEFT:
+				if (player.dir == Left) {
+					player.dir = 5;
+				}
+				break;
 			}
 		}
 
@@ -226,6 +342,7 @@ int main() {
 		if (al_is_event_queue_empty(queue)) {
 			al_clear_to_color(al_map_rgb(255, 255, 255));
 			al_draw_bitmap(player.spriteBitmap, player.x, player.y, ALLEGRO_FLIP_HORIZONTAL);
+			al_draw_bitmap(enemy.spriteBitmap, enemy.x, enemy.y, 0);
 
 			for (i = 0; i < projectileMax; i++) {
 				if (projectile[i].projectileTravel) {
