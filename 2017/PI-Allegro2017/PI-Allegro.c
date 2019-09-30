@@ -29,18 +29,13 @@ struct sprite {
 	// Felipe
 	ALLEGRO_BITMAP *spriteBitmap;
 	float x, y;
-	float x0, y0;
 	float width, height;
-	float speed, accel;
 	float life;
 	int hitboxWidth, hitboxHeight;
 	int spriteChange;
-	int damage;
 	bool isShooting;
 	bool jump;
 	bool alive;
-	bool projectileTravel;
-	bool projectileHit;
 
 	//Helkson
 	int dir;
@@ -48,12 +43,24 @@ struct sprite {
 	float vel_y;
 };
 
+struct projectile {
+	ALLEGRO_BITMAP *spriteBitmap;
+	float x, y;
+	float x0, y0;
+	float width, height;
+	float speed, accel;
+	int hitboxWidth, hitboxHeight;
+	int damage;
+	bool projectileTravel;
+	bool projectileHit;
+};
+
 ALLEGRO_DISPLAY * display = NULL;
 ALLEGRO_FONT * font = NULL;
 ALLEGRO_TIMER * timer = NULL;
 ALLEGRO_EVENT_QUEUE * queue = NULL;
 struct sprite player;
-struct sprite projectile[projectileMax];
+struct projectile playerShot[projectileMax];
 struct sprite enemy;
 
 int initialize() {
@@ -92,6 +99,7 @@ int initplayer(struct sprite *c) {
 		fprintf(stderr, "Falha ao carregar imagem!\n");
 		return -1;
 	}
+	al_convert_mask_to_alpha(c->spriteBitmap, al_map_rgb(255, 0, 255));
 
 	c->x = 100;
 	c->y = 500;
@@ -109,6 +117,7 @@ int initplayer(struct sprite *c) {
 
 int initenemy(struct sprite *e) {
 	e->spriteBitmap = al_load_bitmap("Img/miniufo.bmp");
+	al_convert_mask_to_alpha(e->spriteBitmap, al_map_rgb(255, 0, 255));
 
 	e->x = 550 + randombytes_uniform(201);
 	e->y = 400 + randombytes_uniform(101);
@@ -124,9 +133,11 @@ int initenemy(struct sprite *e) {
 }
 
 
-void actShoot(struct sprite *p, struct sprite *c, int n) {
+void actShoot(struct projectile *p, struct sprite *c, int n) {
 	p->spriteBitmap = al_load_bitmap("Img/tiro.bmp");
+	al_convert_mask_to_alpha(p->spriteBitmap, al_map_rgb(255, 0, 255));
 	c->spriteBitmap = al_load_bitmap("Img/alienShot.bmp");
+	al_convert_mask_to_alpha(c->spriteBitmap, al_map_rgb(255, 0, 255));
 
 	p->speed = projectileVelocity;
 	p->accel = projectileAccel;
@@ -146,7 +157,7 @@ void actShoot(struct sprite *p, struct sprite *c, int n) {
 	p->projectileTravel = true;
 }
 
-int refreshProjectileState(struct sprite p[], int i, int n) {
+int refreshProjectileState(struct projectile p[], int i, int n) {
 	int j, aux;
 
 	aux = n;
@@ -175,13 +186,32 @@ int refreshProjectileState(struct sprite p[], int i, int n) {
 	}
 }
 
+void refreshMovementState(struct sprite *p) {
+	if (p->y >= 500) {
+		p->y = 500;
+		p->jump = false;
+	}
+	else {
+		p->vel_y += gravity;
+		p->y += p->vel_y;
+	}
+
+	if (p->x <= 0) {
+		p->x = 1;
+	}
+
+	if (p->x >= 732) {
+		p->x = 731;
+	}
+}
+
 void createTarget(struct sprite *e) {
 	e->x = 550 + randombytes_uniform(201);
 	e->y = 400 + randombytes_uniform(101);
 	e->life = targetPracticeLife;
 }
 
-int hitboxDetection(struct sprite *a, struct sprite b) {
+int hitboxDetection(struct projectile *a, struct sprite b) {
 	float xAxisPivotA, yAxisPivotA, xAxisPivotB, yAxisPivotB, rightA, leftA, downA, upA, rightB, leftB, downB, upB;
 	int i, hitCount = 0;
 
@@ -234,14 +264,15 @@ int main() {
 				if (player.spriteChange > 30) {
 					player.spriteChange = 0;
 					player.spriteBitmap = al_load_bitmap("Img/alienNeutral.bmp");
+					al_convert_mask_to_alpha(player.spriteBitmap, al_map_rgb(255, 0, 255));
 					player.isShooting = false;
 				}
 				else player.spriteChange++;
 			}
 
-			projectileCount = projectileCount - refreshProjectileState(projectile, lastProjectileI, projectileCount);
+			projectileCount = projectileCount - refreshProjectileState(playerShot, lastProjectileI, projectileCount);
 
-			hit = hitboxDetection(projectile, enemy);
+			hit = hitboxDetection(playerShot, enemy);
 
 			projectileCount = projectileCount - hit;
 
@@ -269,22 +300,7 @@ int main() {
 				break;
 			}
 
-			if (player.y >= 500) {
-				player.y = 500;
-				player.jump = false;
-			}
-			else {
-				player.vel_y += gravity;
-				player.y += player.vel_y;
-			}
-
-			if (player.x <= 0) {
-				player.x = 1;
-			}
-
-			if (player.x >= 732) {
-				player.x = 731;
-			}
+			refreshMovementState(&player);
 
 			al_flip_display();
 		}
@@ -311,12 +327,10 @@ int main() {
 					projectileCount++;
 					lastProjectileI = (lastProjectileI + 1) % 3;
 					player.spriteChange = 0;
-					actShoot(&projectile[lastProjectileI], &player, lastProjectileI);
+					actShoot(&playerShot[lastProjectileI], &player, lastProjectileI);
 				}
 				break;
 			}
-			
-			
 		}
 
 		if (event.type == ALLEGRO_EVENT_KEY_UP)
@@ -345,8 +359,8 @@ int main() {
 			al_draw_bitmap(enemy.spriteBitmap, enemy.x, enemy.y, 0);
 
 			for (i = 0; i < projectileMax; i++) {
-				if (projectile[i].projectileTravel) {
-					al_draw_bitmap(projectile[i].spriteBitmap, projectile[i].x, projectile[i].y, ALLEGRO_FLIP_HORIZONTAL);
+				if (playerShot[i].projectileTravel) {
+					al_draw_bitmap(playerShot[i].spriteBitmap, playerShot[i].x, playerShot[i].y, ALLEGRO_FLIP_HORIZONTAL);
 				}
 			}
 
@@ -360,9 +374,10 @@ int main() {
 	al_uninstall_keyboard();
 	al_uninstall_mouse();
 	al_destroy_bitmap(player.spriteBitmap);
-	al_destroy_bitmap(projectile[0].spriteBitmap);
-	al_destroy_bitmap(projectile[1].spriteBitmap);
-	al_destroy_bitmap(projectile[2].spriteBitmap);
+	al_destroy_bitmap(enemy.spriteBitmap);
+	al_destroy_bitmap(playerShot[0].spriteBitmap);
+	al_destroy_bitmap(playerShot[1].spriteBitmap);
+	al_destroy_bitmap(playerShot[2].spriteBitmap);
 
 	return 0;
 }
