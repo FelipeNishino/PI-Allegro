@@ -1,0 +1,14 @@
+﻿  PI-Allegro.c
+c:\users\keeee\source\repos\pi-allegro\2017\pi-allegro2017\pi-allegro.c(73): warning C4013: 'sodium_init' undefined; assuming extern returning int
+c:\users\keeee\source\repos\pi-allegro\2017\pi-allegro2017\pi-allegro.c(130): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
+PI-Allegro.obj : error LNK2019: unresolved external symbol __imp_al_init_image_addon referenced in function initialize
+PI-Allegro.obj : error LNK2019: unresolved external symbol __imp_al_load_font referenced in function initialize
+PI-Allegro.obj : error LNK2019: unresolved external symbol __imp_al_draw_text referenced in function main
+PI-Allegro.obj : error LNK2019: unresolved external symbol __imp_al_destroy_font referenced in function main
+PI-Allegro.obj : error LNK2019: unresolved external symbol __imp_al_init_font_addon referenced in function initialize
+PI-Allegro.obj : error LNK2019: unresolved external symbol __imp_al_init_ttf_addon referenced in function initialize
+PI-Allegro.obj : error LNK2019: unresolved external symbol __imp_al_init_primitives_addon referenced in function initialize
+PI-Allegro.obj : error LNK2019: unresolved external symbol __imp_al_draw_filled_rectangle referenced in function main
+PI-Allegro.obj : error LNK2019: unresolved external symbol sodium_init referenced in function initialize
+PI-Allegro.obj : error LNK2019: unresolved external symbol randombytes_uniform referenced in function createTarget
+C:\Users\keeee\source\repos\PI-Allegro\2017\PI-Allegro2017\x64\Debug\PI-Allegro2017.exe : fatal error LNK1120: 10 unresolved externals
