@@ -187,7 +187,7 @@ void actShoot(struct projectile *p, struct sprite *c) {
 	p->projectileTravel = true;
 }
 
-int refreshProjectileState(struct projectile p[], int i) {
+int refreshProjectileState(struct projectile p[]) {
 	int j, hitCount = 0;
 
 	for (j = 0; j < projectileMax; j++) {
@@ -274,7 +274,7 @@ int hitboxDetection(struct projectile *a, struct sprite b) {
 }
 
 int main() {
-	int i, projectileCount = 0, enemyDmgGauge = 0, hit = 0, lastProjectileI = -1, frameCount = 0, auxFrameCount = 0, killCount = 0;
+	int i, projectileCount = 0, enemyDmgGauge = 0, hit = 0, frameCount = 0, auxFrameCount = 0, killCount = 0;
 	char enemyLifeGauge[5], kcText[15];
 	bool gameLoop = true;
 
@@ -304,7 +304,7 @@ int main() {
 				else player.spriteChange++;
 			}
 
-			projectileCount -= refreshProjectileState(playerShot, lastProjectileI);
+			projectileCount -= refreshProjectileState(playerShot);
 
 			hit = hitboxDetection(playerShot, enemy);
 
@@ -374,10 +374,14 @@ int main() {
 
 			case ALLEGRO_KEY_SPACE:
 				if (projectileCount < projectileMax) {
-					projectileCount++;
-					lastProjectileI = (lastProjectileI + 1) % projectileMax;
-					player.spriteChange = 0;
-					actShoot(&playerShot[lastProjectileI], &player);
+					for (i = 0; i < projectileMax; i++) {
+						if (!playerShot[i].projectileTravel) {
+							projectileCount++;
+							player.spriteChange = 0;
+							actShoot(&playerShot[i], &player);
+							break;
+						}
+					}
 				}
 				break;
 			}
