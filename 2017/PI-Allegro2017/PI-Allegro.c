@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <allegro5/allegro.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_font.h>
@@ -60,6 +62,8 @@ struct projectile {
 ALLEGRO_DISPLAY * display = NULL;
 ALLEGRO_FONT * font = NULL;
 ALLEGRO_TIMER * timer = NULL;
+ALLEGRO_SAMPLE *sample = NULL;
+ALLEGRO_SAMPLE_INSTANCE *sampleInstance = NULL;
 ALLEGRO_EVENT_QUEUE * queue = NULL;
 ALLEGRO_BITMAP *backgroundL1;
 ALLEGRO_BITMAP *backgroundL2;
@@ -74,8 +78,11 @@ int initialize() {
 
 	al_init();
 	al_init_image_addon();
+	al_install_audio();
+	al_init_acodec_addon();
 	al_init_font_addon();
 	al_init_ttf_addon();
+	al_get_default_mixer();
 	al_init_primitives_addon();
 
 	timer = al_create_timer(1.0 / FPS);
@@ -83,6 +90,8 @@ int initialize() {
 	queue = al_create_event_queue();
 	font = al_load_font("Fonts/metal-slug.ttf", 13, 0);
 	al_set_window_title(display, "Metal Slug 5");
+	al_reserve_samples(1);
+	sample = al_load_sample("Audio/fundo.ogg");
 
 	al_install_keyboard();
 	al_install_mouse();
@@ -123,6 +132,7 @@ int initplayer(struct sprite *c) {
 	}
 	al_convert_mask_to_alpha(c->spriteBitmap, al_map_rgb(255, 0, 255));
 
+
 	c->x = 366;
 	c->y = 50;
 	c->hitboxWidth = 68;
@@ -138,7 +148,7 @@ int initplayer(struct sprite *c) {
 int initenemy(struct sprite *e) {	
 	e->spriteBitmap = al_load_bitmap("Img/miniufo.bmp");
 	al_convert_mask_to_alpha(e->spriteBitmap, al_map_rgb(255, 0, 255));
-
+	
 	enemyRandomizer(e);
 
 	e->life = targetPracticeLife;
@@ -276,11 +286,13 @@ int hitboxDetection(struct projectile *a, struct sprite b) {
 int main() {
 	int i, projectileCount = 0, enemyDmgGauge = 0, hit = 0, frameCount = 0, auxFrameCount = 0, killCount = 0;
 	char enemyLifeGauge[5], kcText[15];
-	bool gameLoop = true;
+	bool gameLoop = false;
+	bool loopMenu = true;
 
 	initialize();
 	initplayer(&player);
 	initenemy(&enemy);
+	
 
 	backgroundL1 = al_load_bitmap("Img/backgroundLayer1.bmp");
 	backgroundL2 = al_load_bitmap("Img/backgroundLayer2.bmp");
@@ -288,6 +300,27 @@ int main() {
 	al_convert_mask_to_alpha(foreground, al_map_rgb(255, 0, 255));
 
 	al_clear_to_color(al_map_rgb(255, 255, 255));
+
+	while (loopMenu) {
+		ALLEGRO_EVENT event;
+		al_wait_for_event(queue, &event);
+
+		if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+			if (event.keyboard.keycode == ALLEGRO_KEY_SPACE) {
+				loopMenu = false;
+				gameLoop = true;
+			}
+		}
+
+		if (al_is_event_queue_empty(queue)) {
+			al_clear_to_color(al_map_rgb(0, 0, 0));
+
+			al_flip_display();
+		}
+
+	}
+
+	al_play_sample(sample, 5.0, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
 
 	while (gameLoop) {
 		ALLEGRO_EVENT event;
@@ -452,6 +485,9 @@ int main() {
 		}
 	}
 
+
+	
+
 	al_destroy_timer(timer);
 	al_destroy_display(display);
 	al_destroy_font(font);
@@ -462,9 +498,12 @@ int main() {
 	al_destroy_bitmap(backgroundL1);
 	al_destroy_bitmap(backgroundL2);
 	al_destroy_bitmap(foreground);
+	al_destroy_sample(sample);
 	for (i = 0; i < projectileMax; i++) {
 		al_destroy_bitmap(playerShot[i].spriteBitmap);
 	}
+
+	
 
 	return 0;
 }
