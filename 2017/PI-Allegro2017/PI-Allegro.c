@@ -19,6 +19,9 @@
 #define projectileOffset 10
 #define projectileMax 3
 #define projectileDamage 10
+#define antiVirus 0
+#define antiBiotic 1
+#define antiMycotic 2
 #define targetPracticeLife 20
 #define SODIUM_STATIC
 
@@ -35,6 +38,10 @@ struct sprite {
 	float life, maxLife;
 	int hitboxWidth, hitboxHeight;
 	int spriteChange;
+	int r;
+	int g;
+	int b;
+	int selectedWeapon;
 	int currentDir;
 	bool isShooting;
 	bool jump;
@@ -53,8 +60,12 @@ struct projectile {
 	float width, height;
 	float speed, accel;
 	int hitboxWidth, hitboxHeight;
-	int damage;
+	float damage;
+	int type;
 	int dir;
+	int r;
+	int g;
+	int b;
 	bool projectileTravel;
 	bool projectileHit;
 };
@@ -65,6 +76,7 @@ ALLEGRO_TIMER * timer = NULL;
 ALLEGRO_SAMPLE *sample = NULL;
 ALLEGRO_SAMPLE_INSTANCE *sampleInstance = NULL;
 ALLEGRO_EVENT_QUEUE * queue = NULL;
+ALLEGRO_BITMAP *playerShotTemplate;
 ALLEGRO_BITMAP *backgroundL1;
 ALLEGRO_BITMAP *backgroundL2;
 ALLEGRO_BITMAP *foreground;
@@ -92,6 +104,8 @@ int initialize() {
 	al_set_window_title(display, "Metal Slug 5");
 	al_reserve_samples(1);
 	sample = al_load_sample("Audio/fundo.ogg");
+	playerShotTemplate = al_load_bitmap("Img/Tiro.bmp");
+	al_convert_mask_to_alpha(playerShotTemplate, al_map_rgb(255, 0, 255));
 
 	al_install_keyboard();
 	al_install_mouse();
@@ -107,8 +121,49 @@ int initialize() {
 	return 0;
 }
 
+void setSpriteColor(struct sprite *a) {
+	switch (a->selectedWeapon) {
+	case antiVirus:
+		a->r = 0;
+		a->g = 255;
+		a->b = 0;
+		break;
+	case antiBiotic:
+		a->r = 255;
+		a->g = 0;
+		a->b = 255;
+		break;
+	case antiMycotic:
+		a->r = 0;
+		a->g = 0;
+		a->b = 255;
+		break;
+	}
+}
+
+void setProjectileColor(struct projectile *a) {
+	switch (a->type) {
+	case antiVirus:
+		a->r = 0;
+		a->g = 255;
+		a->b = 0;
+		break;
+	case antiBiotic:
+		a->r = 255;
+		a->g = 0;
+		a->b = 255;
+		break;
+	case antiMycotic:
+		a->r = 0;
+		a->g = 0;
+		a->b = 255;
+		break;
+	}
+}
+
 void enemyRandomizer(struct sprite *e) {
 	int section;
+	int lifeRandomizer = randombytes_uniform(16);
 
 	section = randombytes_uniform(2);
 
@@ -121,6 +176,13 @@ void enemyRandomizer(struct sprite *e) {
 
 	e->y = 250 + randombytes_uniform(101);
 
+	e->selectedWeapon = randombytes_uniform(3);
+
+	setSpriteColor(e);
+
+	e->life = targetPracticeLife + lifeRandomizer;
+	e->maxLife = targetPracticeLife + lifeRandomizer;
+
 	e->alive = true;
 }
 
@@ -132,7 +194,6 @@ int initplayer(struct sprite *c) {
 	}
 	al_convert_mask_to_alpha(c->spriteBitmap, al_map_rgb(255, 0, 255));
 
-
 	c->x = 366;
 	c->y = 50;
 	c->hitboxWidth = 68;
@@ -140,6 +201,7 @@ int initplayer(struct sprite *c) {
 	c->vel_x = 4.5;
 	c->dir = 5;
 	c->currentDir = Right;
+	c->selectedWeapon = 0;
 	c->jump = false;
 
 	return 0;
@@ -150,9 +212,6 @@ int initenemy(struct sprite *e) {
 	al_convert_mask_to_alpha(e->spriteBitmap, al_map_rgb(255, 0, 255));
 	
 	enemyRandomizer(e);
-
-	e->life = targetPracticeLife;
-	e->maxLife = targetPracticeLife;
 
 	e->width = 44;
 	e->height = 38;
@@ -190,6 +249,9 @@ void actShoot(struct projectile *p, struct sprite *c) {
 		p->y0 = c->y + projectileOffset;
 	}
 	
+	p->damage = projectileDamage;
+	p->type = c->selectedWeapon;
+
 	p->x = p->x0;
 	p->y = p->y0;
 
@@ -240,18 +302,9 @@ void refreshMovementState(struct sprite *p) {
 	}
 }
 
-void createTarget(struct sprite *e) {
-	int lifeRandomizer = randombytes_uniform(16);
-
-	enemyRandomizer(e);
-
-	e->life = targetPracticeLife + lifeRandomizer;
-	e->maxLife = targetPracticeLife + lifeRandomizer;
-}
-
-int hitboxDetection(struct projectile *a, struct sprite b) {
+int hitboxDetection(struct projectile *a, struct sprite b, int *hitCount) {
 	float xAxisPivotA, yAxisPivotA, xAxisPivotB, yAxisPivotB, rightA, leftA, downA, upA, rightB, leftB, downB, upB;
-	int i, hitCount = 0;
+	int i, hitI = -1;
 
 	for (i = 0; i < projectileMax; i++) {
 		if (a[i].projectileTravel) {
@@ -275,25 +328,24 @@ int hitboxDetection(struct projectile *a, struct sprite b) {
 					a[i].projectileTravel = false;
 					a[i].x = 0;
 					a[i].y = 0;
-					hitCount++;
+					*hitCount += 1;
+					hitI = i;
 				}
 			}
 		}
 	}
-	return hitCount;
+	return hitI;
 }
 
 int main() {
-	int i, projectileCount = 0, enemyDmgGauge = 0, hit = 0, frameCount = 0, auxFrameCount = 0, killCount = 0;
+	int i, projectileCount = 0, enemyDmgGauge = 0, hit = 0, hitI = 0, frameCount = 0, auxFrameCount = 0, killCount = 0;
 	char enemyLifeGauge[5], kcText[15];
-	bool gameLoop = false;
-	bool loopMenu = true;
+	bool gameLoop = false, menuLoop = true, toggleStartText = true;
 
 	initialize();
 	initplayer(&player);
 	initenemy(&enemy);
 	
-
 	backgroundL1 = al_load_bitmap("Img/backgroundLayer1.bmp");
 	backgroundL2 = al_load_bitmap("Img/backgroundLayer2.bmp");
 	foreground = al_load_bitmap("Img/foreground2.bmp");
@@ -301,20 +353,29 @@ int main() {
 
 	al_clear_to_color(al_map_rgb(255, 255, 255));
 
-	while (loopMenu) {
+	while (menuLoop) {
 		ALLEGRO_EVENT event;
 		al_wait_for_event(queue, &event);
 
 		if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
 			if (event.keyboard.keycode == ALLEGRO_KEY_SPACE) {
-				loopMenu = false;
+				menuLoop = false;
 				gameLoop = true;
 			}
 		}
 
+		if (event.type == ALLEGRO_EVENT_TIMER) {
+			frameCount++;
+		}
+
 		if (al_is_event_queue_empty(queue)) {
 			al_clear_to_color(al_map_rgb(0, 0, 0));
-
+			if (frameCount % 60 == 0) {
+				toggleStartText = !toggleStartText;
+			}
+			if (toggleStartText) {
+				al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, windowHeight / 2, ALLEGRO_ALIGN_CENTER, "Press space to start mission!!");
+			}
 			al_flip_display();
 		}
 
@@ -339,12 +400,14 @@ int main() {
 
 			projectileCount -= refreshProjectileState(playerShot);
 
-			hit = hitboxDetection(playerShot, enemy);
+			hitI = hitboxDetection(playerShot, enemy, &hit);
 
 			projectileCount -= hit;
 
 			while (hit > 0) {
-				enemy.life -= projectileDamage;
+				if (enemy.selectedWeapon == playerShot[hitI].type) {
+					enemy.life -= playerShot[0].damage + playerShot[0].damage * (randombytes_uniform(16) / 100.0);
+				}
 				hit--;
 				
 				if (enemy.life <= 0) {
@@ -357,7 +420,7 @@ int main() {
 			}
 
 			if (!enemy.alive && frameCount - auxFrameCount >= 60) {
-				createTarget(&enemy);
+				enemyRandomizer(&enemy);
 				enemyDmgGauge = 0;
 				enemy.alive = true;
 			}
@@ -382,13 +445,15 @@ int main() {
 				enemyDmgGauge++;
 			}
 
+			setSpriteColor(&player);
+
 			frameCount++;
 			al_flip_display();
 		}
 
 		if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
 			switch (event.keyboard.keycode) {
-			case ALLEGRO_KEY_UP:
+			case ALLEGRO_KEY_Z:
 				if (!player.jump) {
 					player.vel_y = -7;
 					player.y--;
@@ -405,7 +470,19 @@ int main() {
 				player.currentDir = Right;
 				break;
 
-			case ALLEGRO_KEY_SPACE:
+			case ALLEGRO_KEY_A:
+				player.selectedWeapon--;
+				if (player.selectedWeapon < 0) {
+					player.selectedWeapon = 2;
+				}
+				break;
+
+			case ALLEGRO_KEY_S:
+				player.selectedWeapon++;
+				player.selectedWeapon = player.selectedWeapon % 3;
+				break;
+
+			case ALLEGRO_KEY_X:
 				if (projectileCount < projectileMax) {
 					for (i = 0; i < projectileMax; i++) {
 						if (!playerShot[i].projectileTravel) {
@@ -448,10 +525,10 @@ int main() {
 
 			if (enemy.alive) {
 				if (enemy.x < 400) {
-					al_draw_bitmap(enemy.spriteBitmap, enemy.x, enemy.y, ALLEGRO_FLIP_HORIZONTAL);
+					al_draw_tinted_bitmap(enemy.spriteBitmap, al_map_rgb(enemy.r, enemy.g, enemy.b), enemy.x, enemy.y, ALLEGRO_FLIP_HORIZONTAL);
 				}
 				else {
-					al_draw_bitmap(enemy.spriteBitmap, enemy.x, enemy.y, 0);
+					al_draw_tinted_bitmap(enemy.spriteBitmap, al_map_rgb(enemy.r, enemy.g, enemy.b), enemy.x, enemy.y, 0);
 				}
 			}
 
@@ -469,14 +546,16 @@ int main() {
 			sprintf_s(kcText, sizeof(kcText), "killcount = %d", killCount);
 			al_draw_text(font, al_map_rgb(255, 255, 255), 10, 5, 0, kcText);
 
+			al_draw_tinted_bitmap(playerShotTemplate, al_map_rgb(player.r, player.g, player.b), 0, 30, ALLEGRO_FLIP_HORIZONTAL);
 
 			for (i = 0; i < projectileMax; i++) {
 				if (playerShot[i].projectileTravel) {
+					setProjectileColor(&playerShot[i]);
 					if (playerShot[i].dir == Right)	{
-						al_draw_bitmap(playerShot[i].spriteBitmap, playerShot[i].x, playerShot[i].y, ALLEGRO_FLIP_HORIZONTAL);
+						al_draw_tinted_bitmap(playerShot[i].spriteBitmap, al_map_rgb(playerShot[i].r, playerShot[i].g, playerShot[i].b), playerShot[i].x, playerShot[i].y, ALLEGRO_FLIP_HORIZONTAL);
 					}
 					else {
-						al_draw_bitmap(playerShot[i].spriteBitmap, playerShot[i].x, playerShot[i].y, 0);
+						al_draw_tinted_bitmap(playerShot[i].spriteBitmap, al_map_rgb(playerShot[i].r, playerShot[i].g, playerShot[i].b), playerShot[i].x, playerShot[i].y, 0);
 					}
 				}
 			}
