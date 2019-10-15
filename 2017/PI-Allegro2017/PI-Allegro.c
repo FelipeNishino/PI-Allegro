@@ -32,7 +32,7 @@
 
 struct sprite {
 	// Felipe
-	ALLEGRO_BITMAP* spriteBitmap;
+	ALLEGRO_BITMAP *spriteBitmap;
 	float x, y;
 	float width, height;
 	float life, maxLife;
@@ -47,14 +47,14 @@ struct sprite {
 	bool jump;
 	bool alive;
 
-	//Helkson
+
 	int dir;
 	float vel_x;
 	float vel_y;
 };
 
 struct projectile {
-	ALLEGRO_BITMAP* spriteBitmap;
+	ALLEGRO_BITMAP *spriteBitmap;
 	float x, y;
 	float x0, y0;
 	float width, height;
@@ -70,16 +70,16 @@ struct projectile {
 	bool projectileHit;
 };
 
-ALLEGRO_DISPLAY* display = NULL;
-ALLEGRO_FONT* font = NULL;
-ALLEGRO_TIMER* timer = NULL;
-ALLEGRO_SAMPLE* sample = NULL;
-ALLEGRO_SAMPLE_INSTANCE* sampleInstance = NULL;
-ALLEGRO_EVENT_QUEUE* queue = NULL;
-ALLEGRO_BITMAP* playerShotTemplate;
-ALLEGRO_BITMAP* backgroundL1;
-ALLEGRO_BITMAP* backgroundL2;
-ALLEGRO_BITMAP* foreground;
+ALLEGRO_DISPLAY * display = NULL;
+ALLEGRO_FONT * font = NULL;
+ALLEGRO_TIMER * timer = NULL;
+ALLEGRO_SAMPLE *sample = NULL;
+ALLEGRO_SAMPLE_INSTANCE *sampleInstance = NULL;
+ALLEGRO_EVENT_QUEUE * queue = NULL;
+ALLEGRO_BITMAP *playerShotTemplate;
+ALLEGRO_BITMAP *backgroundL1;
+ALLEGRO_BITMAP *backgroundL2;
+ALLEGRO_BITMAP *foreground;
 struct sprite player;
 struct projectile playerShot[projectileMax];
 struct sprite enemy;
@@ -103,7 +103,7 @@ int initialize() {
 	font = al_load_font("Fonts/metal-slug.ttf", 13, 0);
 	al_set_window_title(display, "Metal Slug 5");
 	al_reserve_samples(1);
-	sample = al_load_sample("Audio/fundo.ogg");
+	sample = al_load_sample("Audio/bg_music.ogg");
 	playerShotTemplate = al_load_bitmap("Img/Tiro.bmp");
 	al_convert_mask_to_alpha(playerShotTemplate, al_map_rgb(255, 0, 255));
 
@@ -121,7 +121,7 @@ int initialize() {
 	return 0;
 }
 
-void setSpriteColor(struct sprite* a) {
+void setSpriteColor(struct sprite *a) {
 	switch (a->selectedWeapon) {
 	case antiVirus:
 		a->r = 0;
@@ -141,7 +141,7 @@ void setSpriteColor(struct sprite* a) {
 	}
 }
 
-void setProjectileColor(struct projectile* a) {
+void setProjectileColor(struct projectile *a) {
 	switch (a->type) {
 	case antiVirus:
 		a->r = 0;
@@ -161,7 +161,7 @@ void setProjectileColor(struct projectile* a) {
 	}
 }
 
-void enemyRandomizer(struct sprite* e) {
+void enemyRandomizer(struct sprite *e) {
 	int section;
 	int lifeRandomizer = randombytes_uniform(16);
 
@@ -186,7 +186,7 @@ void enemyRandomizer(struct sprite* e) {
 	e->alive = true;
 }
 
-int initplayer(struct sprite* c) {
+int initplayer(struct sprite *c) {
 	c->spriteBitmap = al_load_bitmap("Img/alienNeutral.bmp");
 	if (!c->spriteBitmap) {
 		fprintf(stderr, "Falha ao carregar imagem!\n");
@@ -207,7 +207,7 @@ int initplayer(struct sprite* c) {
 	return 0;
 }
 
-int initenemy(struct sprite* e) {
+int initenemy(struct sprite *e) {
 	e->spriteBitmap = al_load_bitmap("Img/miniufo.bmp");
 	al_convert_mask_to_alpha(e->spriteBitmap, al_map_rgb(255, 0, 255));
 
@@ -223,7 +223,7 @@ int initenemy(struct sprite* e) {
 }
 
 
-void actShoot(struct projectile* p, struct sprite* c) {
+void actShoot(struct projectile *p, struct sprite *c) {
 	p->spriteBitmap = al_load_bitmap("Img/tiro.bmp");
 	al_convert_mask_to_alpha(p->spriteBitmap, al_map_rgb(255, 0, 255));
 	c->spriteBitmap = al_load_bitmap("Img/alienShot.bmp");
@@ -283,7 +283,7 @@ int refreshProjectileState(struct projectile p[]) {
 	return hitCount;
 }
 
-void refreshMovementState(struct sprite* p) {
+void refreshMovementState(struct sprite *p) {
 	if (p->y >= 350) {
 		p->y = 350;
 		p->jump = false;
@@ -302,7 +302,7 @@ void refreshMovementState(struct sprite* p) {
 	}
 }
 
-int hitboxDetection(struct projectile* a, struct sprite b, int* hitCount) {
+int hitboxDetection(struct projectile *a, struct sprite b, int *hitCount) {
 	float xAxisPivotA, yAxisPivotA, xAxisPivotB, yAxisPivotB, rightA, leftA, downA, upA, rightB, leftB, downB, upB;
 	int i, hitI = -1;
 
@@ -453,7 +453,7 @@ int main() {
 
 		if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
 			switch (event.keyboard.keycode) {
-			case ALLEGRO_KEY_Z:
+			case ALLEGRO_KEY_UP:
 				if (!player.jump) {
 					player.vel_y = -7;
 					player.y--;
