@@ -224,8 +224,8 @@ int initenemy(struct sprite* e) {
 
 	enemyRandomizer(e);
 
-	e->vel_x = 0.5;
-	e->vel_y = 0.5;
+	e->vel_x = 1.8;
+	e->vel_y = 1.8;
 
 	e->width = 44;
 	e->height = 38;
@@ -353,7 +353,7 @@ int hitboxDetection(struct projectile* a, struct sprite b, int* hitCount) {
 
 int main() {
 	int i, projectileCount = 0, enemyDmgGauge = 0, hit = 0, hitI = 0, frameCount = 0, auxFrameCount = 0, killCount = 0;
-	double anglePE;
+	double anglePE, cosPE, sinPE;
 	char enemyLifeGauge[5], kcText[15];
 	bool gameLoop = false, menuLoop = true, toggleStartText = true;
 
@@ -462,22 +462,27 @@ int main() {
 
 			anglePE = atan2((-1 * enemy.y) - (-1 * player.y), enemy.x - player.x);
 			anglePE = anglePE * 180 / PI;
+			cosPE = cos(anglePE);
+			sinPE = sin(anglePE);
+			absD(&cosPE);
+			absD(&sinPE);
 			//absD(&anglePE);
+
 
 			if (enemy.x != player.x) {
 				if (enemy.x > player.x)	{
-					enemy.x -= enemy.vel_x * cos(anglePE);
+					enemy.x -= enemy.vel_x * cosPE;
 				}
 				else {
-					enemy.x += enemy.vel_x * cos(anglePE);
+					enemy.x += enemy.vel_x * cosPE;
 				}
 			}
 			if (enemy.y != player.y) {
 				if (enemy.y > player.y) {
-					enemy.y += enemy.vel_y * sin(anglePE);
+					enemy.y -= enemy.vel_y * sinPE;
 				}
 				else {
-					enemy.y -= enemy.vel_y * sin(anglePE);
+					enemy.y += enemy.vel_y * sinPE;
 				}
 			}
 
