@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
@@ -23,6 +24,7 @@
 #define antiBiotic 1
 #define antiMycotic 2
 #define targetPracticeLife 20
+#define PI 3.14159265
 #define SODIUM_STATIC
 
 // Helkson
@@ -33,7 +35,7 @@
 struct sprite {
 	// Felipe
 	ALLEGRO_BITMAP *spriteBitmap;
-	float x, y;
+	double x, y;
 	float width, height;
 	float life, maxLife;
 	int hitboxWidth, hitboxHeight;
@@ -55,7 +57,7 @@ struct sprite {
 
 struct projectile {
 	ALLEGRO_BITMAP *spriteBitmap;
-	float x, y;
+	double x, y;
 	float x0, y0;
 	float width, height;
 	float speed, accel;
@@ -83,6 +85,7 @@ ALLEGRO_BITMAP *foreground;
 struct sprite player;
 struct projectile playerShot[projectileMax];
 struct sprite enemy;
+struct projectile enemyShot[25];
 
 int initialize() {
 
@@ -119,6 +122,13 @@ int initialize() {
 	al_start_timer(timer);
 
 	return 0;
+}
+
+double absD(double *x) {
+	if (*x < 0) {
+		*x = -1 * (*x);
+	}
+	return *x;
 }
 
 void setSpriteColor(struct sprite *a) {
@@ -165,7 +175,8 @@ void enemyRandomizer(struct sprite *e) {
 	int section;
 	int lifeRandomizer = randombytes_uniform(16);
 
-	section = randombytes_uniform(2);
+	//section = randombytes_uniform(2);
+	section = 1;
 
 	if (section == 1) {
 		e->x = 550 + randombytes_uniform(201);
@@ -212,6 +223,9 @@ int initenemy(struct sprite *e) {
 	al_convert_mask_to_alpha(e->spriteBitmap, al_map_rgb(255, 0, 255));
 
 	enemyRandomizer(e);
+
+	e->vel_x = 0.5;
+	e->vel_y = 0.5;
 
 	e->width = 44;
 	e->height = 38;
@@ -339,6 +353,7 @@ int hitboxDetection(struct projectile *a, struct sprite b, int *hitCount) {
 
 int main() {
 	int i, projectileCount = 0, enemyDmgGauge = 0, hit = 0, hitI = 0, frameCount = 0, auxFrameCount = 0, killCount = 0;
+	double anglePE;
 	char enemyLifeGauge[5], kcText[15];
 	bool gameLoop = false, menuLoop = true, toggleStartText = true;
 
@@ -368,6 +383,10 @@ int main() {
 			frameCount++;
 		}
 
+		if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE || event.type == ALLEGRO_KEY_ESCAPE) {
+			gameLoop = false;
+		}
+
 		if (al_is_event_queue_empty(queue)) {
 			al_clear_to_color(al_map_rgb(0, 0, 0));
 			if (frameCount % 60 == 0) {
@@ -381,7 +400,7 @@ int main() {
 
 	}
 
-	al_play_sample(sample, 5.0, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
+	al_play_sample(sample, 0.1, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
 
 	while (gameLoop) {
 		ALLEGRO_EVENT event;
@@ -440,6 +459,27 @@ int main() {
 			}
 
 			refreshMovementState(&player);
+
+			anglePE = atan2((-1 * enemy.y) - (-1 * player.y), enemy.x - player.x);
+			anglePE = anglePE * 180 / PI;
+			//absD(&anglePE);
+
+			if (enemy.x != player.x) {
+				if (enemy.x > player.x)	{
+					enemy.x -= enemy.vel_x * cos(anglePE);
+				}
+				else {
+					enemy.x += enemy.vel_x * cos(anglePE);
+				}
+			}
+			if (enemy.y != player.y) {
+				if (enemy.y > player.y) {
+					enemy.y += enemy.vel_y * sin(anglePE);
+				}
+				else {
+					enemy.y -= enemy.vel_y * sin(anglePE);
+				}
+			}
 
 			if (enemyDmgGauge < enemy.maxLife - enemy.life && frameCount % 2 == 0) {
 				enemyDmgGauge++;

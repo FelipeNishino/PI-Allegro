@@ -1,4 +1,4 @@
 ﻿  PI-Allegro.c
-c:\users\hgm\documents\github\pi-allegro\2017\pi-allegro2017\pi-allegro.c(89): warning C4013: 'sodium_init' indefinido; assumindo extern retornando int
-c:\users\hgm\documents\github\pi-allegro\2017\pi-allegro2017\pi-allegro.c(166): warning C4013: 'randombytes_uniform' indefinido; assumindo extern retornando int
-  PI-Allegro2017.vcxproj -> C:\Users\HGM\Documents\GitHub\PI-Allegro\2017\PI-Allegro2017\Debug\PI-Allegro2017.exe
+c:\users\keeee\source\repos\pi-allegro\2017\pi-allegro2017\pi-allegro.c(92): warning C4013: 'sodium_init' undefined; assuming extern returning int
+c:\users\keeee\source\repos\pi-allegro\2017\pi-allegro2017\pi-allegro.c(176): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
+  PI-Allegro2017.vcxproj -> C:\Users\keeee\source\repos\PI-Allegro\2017\PI-Allegro2017\Debug\PI-Allegro2017.exe
