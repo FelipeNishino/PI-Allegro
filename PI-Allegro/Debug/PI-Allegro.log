@@ -1,4 +1,4 @@
 ﻿  PI-Allegro.c
-E:\Fefo\PI-Allegro.c(92,13): warning C4013: 'sodium_init' undefined; assuming extern returning int
-E:\Fefo\PI-Allegro.c(176,42): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(92,13): warning C4013: 'sodium_init' undefined; assuming extern returning int
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(176,42): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
   PI-Allegro.vcxproj -> C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe
