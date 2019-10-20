@@ -223,8 +223,8 @@ int initenemy(struct sprite* e) {
 
 	enemyRandomizer(e);
 
-	e->vel_x = 1.8;
-	e->vel_y = 1.8;
+	e->vel_x = 1;
+	e->vel_y = 1;
 
 	e->width = 44;
 	e->height = 38;
@@ -468,27 +468,39 @@ int main() {
 			//absD(&anglePE);
 
 
-			if (enemy.x != player.x) {
-				if (enemy.vel_x < 2.2) {
+			if (enemy.x != player.x ) {
+				if (enemy.vel_x < 1.2) {
 					enemy.vel_x += projectileAccel;
 				}
-				if (enemy.vel_y < 2.2) {
+				if (enemy.vel_y < 1.2) {
 					enemy.vel_y += projectileAccel;
 				}
-				if (enemy.x > player.x) {
+				
+				if (enemy.x > player.x ) {
 					enemy.x -= enemy.vel_x * cosPE;
 				}
 				else {
 					enemy.x += enemy.vel_x * cosPE;
 				}
 			}
+			else {
+				if (enemy.x = player.x +22) {
+						enemy.x = enemy.x + 200;
+			
+				}
+			}
 			if (enemy.y != player.y) {
 				if (enemy.y > player.y) {
 					enemy.y -= enemy.vel_y * sinPE;
 				}
-				else {
+				else if (enemy.y < player.y) {
 					enemy.y += enemy.vel_y * sinPE;
 				}
+				
+			}
+			else {
+			
+				enemy.y = enemy.y - 100;
 			}
 
 			if (enemyDmgGauge < enemy.maxLife - enemy.life && frameCount % 2 == 0) {
@@ -505,7 +517,7 @@ int main() {
 			switch (event.keyboard.keycode) {
 			case ALLEGRO_KEY_UP:
 				if (!player.jump) {
-					player.vel_y = -7;
+					player.vel_y = -8;
 					player.y--;
 					player.jump = true;
 				}
@@ -566,6 +578,8 @@ int main() {
 		if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE || event.type == ALLEGRO_KEY_ESCAPE) {
 			gameLoop = false;
 		}
+
+		
 
 		if (al_is_event_queue_empty(queue)) {
 			al_clear_to_color(al_map_rgb(255, 255, 255));
