@@ -1,4 +1,11 @@
 ﻿  PI-Allegro.c
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(92,13): warning C4013:  'sodium_init' undefined; assuming extern returning int
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(176,42): warning C4013:  'randombytes_uniform' undefined; assuming extern returning int
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(100,13): warning C4013:  'sodium_init' undefined; assuming extern returning int
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(184,42): warning C4013:  'randombytes_uniform' undefined; assuming extern returning int
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(371,36): warning C4047:  'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[2]'
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(371,36): warning C4024:  'initplayer': different types for formal and actual parameter 2
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(372,32): warning C4047:  'function': 'ALLEGRO_BITMAP *' differs in levels of indirection from 'ALLEGRO_BITMAP **'
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(372,32): warning C4024:  'initenemy': different types for formal and actual parameter 2
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(366,17): warning C4101:  'cosPE': unreferenced local variable
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(366,8): warning C4101:  'anglePE': unreferenced local variable
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(366,24): warning C4101:  'sinPE': unreferenced local variable
   PI-Allegro.vcxproj -> C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe
