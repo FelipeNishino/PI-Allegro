@@ -365,7 +365,7 @@ int main() {
 	int i, projectileCount = 0, enemyDmgGauge = 0, hit = 0, hitI = 0, frameCount = 0, auxFrameCount = 0, killCount = 0;
 	float anglePE, cosPE, sinPE;
 	char enemyLifeGauge[5], kcText[15];
-	bool gameLoop = false, menuLoop = true, toggleStartText = false;
+	bool gameLoop = false, menuLoop = true, toggleStartText = false, jumpPressed = false;
 
 	initialize();
 	initplayer(&player, &playerSprites);
@@ -438,6 +438,14 @@ int main() {
 			hitI = hitboxDetection(playerShot, enemy, &hit);
 
 			projectileCount -= hit;
+
+			if (jumpPressed) {
+				if (!player.jump) {
+					player.vel_y = -8;
+					player.y--;
+					player.jump = true;
+				}
+			}
 
 			while (hit > 0) {
 				if (enemy.selectedWeapon == playerShot[hitI].type) {
@@ -536,11 +544,7 @@ int main() {
 		if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
 			switch (event.keyboard.keycode) {
 			case ALLEGRO_KEY_UP:
-				if (!player.jump) {
-					player.vel_y = -8;
-					player.y--;
-					player.jump = true;
-				}
+				jumpPressed = true;
 				break;
 			case ALLEGRO_KEY_LEFT:
 				player.dir = Left;
@@ -582,6 +586,9 @@ int main() {
 		if (event.type == ALLEGRO_EVENT_KEY_UP)
 		{
 			switch (event.keyboard.keycode) {
+			case ALLEGRO_KEY_UP:
+				jumpPressed = false;
+				break;
 			case ALLEGRO_KEY_RIGHT:
 				if (player.dir == Right) {
 					player.dir = 5;
@@ -631,6 +638,7 @@ int main() {
 			al_draw_filled_rectangle(windowWidth - (2 * (enemy.maxLife - enemyDmgGauge) + 50), 50, windowWidth - (enemy.life + 50), 62, al_map_rgb(255, 0, 0));
 			al_draw_filled_rectangle(windowWidth - 50, 50, windowWidth - (2 * enemy.life + 50), 62, al_map_rgb(0, 128, 0));
 			sprintf_s(enemyLifeGauge, sizeof(enemyLifeGauge), "%.0f", enemy.life);
+
 			al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth - 48, 42, 0, enemyLifeGauge);
 			sprintf_s(kcText, sizeof(kcText), "killcount = %d", killCount);
 			al_draw_text(font, al_map_rgb(255, 255, 255), 10, 5, 0, kcText);
