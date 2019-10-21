@@ -490,12 +490,12 @@ int main() {
 
 			if (enemy.x != player.x && enemy.alive) {
 				if (enemy.x > player.x) {
-					if (enemy.vel_x >= -2.5) {
+					if (enemy.vel_x >= -1.6) {
 						enemy.vel_x -= 0.2;
 					}
 				}
 				else {
-					if (enemy.vel_x <= 2.5) {
+					if (enemy.vel_x <= 1.6) {
 						enemy.vel_x += 0.2;
 					}
 				}
@@ -505,22 +505,26 @@ int main() {
 
 			if (enemy.y != player.y && enemy.alive) {
 				if (enemy.y > player.y) {
-					if (enemy.vel_y >= -2.5) {
+					if (enemy.vel_y >= -1.6) {
 						enemy.vel_y -= 0.2;
 					}
 				}
 				else {
-					if (enemy.vel_y <= 2.5) {
+					if (enemy.vel_y <= 1.6) {
 						enemy.vel_y += 0.2;
 					}
 				}
-				enemy.y += enemy.vel_y;// *sinPE;
+				enemy.y += enemy.vel_y; //*sinPE;
 			}
 
-			if (player.x + player.width > enemy.x && player.x < enemy.x + enemy.width && player.y + player.height > enemy.y && player.y < enemy.y + enemy.height) {
-				//if (enemy.vel_y < 10.5) {
-				enemy.y -= 100;
-				//}
+			if (player.x + player.width - 10 > enemy.x && player.x < enemy.x + enemy.width - 10 && player.y + player.height + 10 > enemy.y && player.y < enemy.y + enemy.height - 10) {
+				int i;
+				for (i = 0; i > -8; i--) {
+					if (enemy.vel_y > -8) {
+						enemy.vel_y--;
+					}
+
+				}
 			}
 
 			if (enemyDmgGauge < enemy.maxLife - enemy.life && frameCount % 2 == 0) {

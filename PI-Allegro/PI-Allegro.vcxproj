@@ -142,7 +142,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PI-Allegro.c" />
-    <ClCompile Include="Source.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
