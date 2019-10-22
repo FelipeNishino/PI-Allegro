@@ -177,12 +177,13 @@
 //			if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
 //				break;
 //		}
-//		if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-//			mouse = event.mouse.button;
-//		}
 //		if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
 //			mouse = 0;
 //		}
+//		if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
+//			mouse = event.mouse.button;
+//		}
+//		
 //		if (event.type == ALLEGRO_EVENT_MOUSE_AXES) {
 //			/* Left button scrolls. */
 //			if (mouse == 1) {
