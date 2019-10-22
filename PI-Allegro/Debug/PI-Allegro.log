@@ -1,9 +1,23 @@
 ﻿  PI-Allegro.c
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(123,13): warning C4013: 'sodium_init' undefined; assuming extern returning int
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(208,42): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(505,17): warning C4133: 'function': incompatible types - from 'ALLEGRO_FILE *' to 'FILE *const '
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(571,36): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(571,36): warning C4024: 'initplayer': different types for formal and actual parameter 2
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(630,41): warning C4047: 'function': 'tile *' differs in levels of indirection from 'tile (*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(630,41): warning C4024: 'refreshPlayerMovement': different types for formal and actual parameter 2
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(145,13): warning C4013: 'sodium_init' undefined; assuming extern returning int
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(230,42): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(414,16): warning C4047: '=': 'int' differs in levels of indirection from 'void *'
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(602,28): warning C4047: '=': 'int *' differs in levels of indirection from 'int'
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(603,23): warning C4047: '=': 'int *' differs in levels of indirection from 'int'
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(640,17): warning C4133: 'function': incompatible types - from 'ALLEGRO_FILE *' to 'FILE *const '
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(706,36): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[2]'
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(706,36): warning C4024: 'initplayer': different types for formal and actual parameter 2
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(707,18): warning C4047: 'function': 'sprite *' differs in levels of indirection from 'sprite (*)[2]'
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(707,18): warning C4024: 'initenemy': different types for formal and actual parameter 1
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(767,42): warning C4047: 'function': 'tile *' differs in levels of indirection from 'tile (*)[2]'
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(767,42): warning C4024: 'refreshPlayerMovement': different types for formal and actual parameter 2
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(768,32): warning C4047: 'function': 'sprite *' differs in levels of indirection from 'sprite (*)[2]'
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(768,32): warning C4024: 'refreshEnemyMovement': different types for formal and actual parameter 1
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(805,39): warning C4047: 'function': 'sprite *' differs in levels of indirection from 'sprite (*)[2]'
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(805,39): warning C4024: 'hitboxDetection': different types for formal and actual parameter 2
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(805,46): warning C4047: 'function': 'int **' differs in levels of indirection from 'int (*)[2]'
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(805,46): warning C4024: 'hitboxDetection': different types for formal and actual parameter 3
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(701,47): warning C4101: 'cosPE': unreferenced local variable
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(701,38): warning C4101: 'anglePE': unreferenced local variable
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(701,54): warning C4101: 'sinPE': unreferenced local variable
   PI-Allegro.vcxproj -> C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe
