@@ -1,0 +1,3 @@
+﻿PI-Allegro.obj : error LNK2019: símbolo externo indefinido sodium_init referenciado na função initialize
+PI-Allegro.obj : error LNK2019: símbolo externo indefinido randombytes_uniform referenciado na função enemyRandomizer
+C:\Users\guigp\OneDrive\Área de Trabalho\PI-Allegro-master\PI-Allegro\x64\Debug\PI-Allegro.exe : fatal error LNK1120: 2 externo não resolvidos
