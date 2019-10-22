@@ -307,7 +307,7 @@ void actShoot(struct projectile* p, struct sprite* c) {
 	p->projectileTravel = true;
 }
 
-void refreshProjectileState(struct projectile p[], int* pCount) {
+void refreshProjectileState(struct projectile p[], int* pCount, int cx) {
 	int j;
 
 	for (j = 0; j < projectileMax; j++) {
@@ -316,7 +316,7 @@ void refreshProjectileState(struct projectile p[], int* pCount) {
 				p[j].speed += p[j].accel;
 			}
 
-			if ((p[j].x + p[j].width) >= 0 && p[j].x <= 800) {
+			if (p[j].x < cx + al_get_display_width(display) && p[j].x > cx) {
 				if (p[j].dir == Right)
 					p[j].x += p[j].speed;
 				else
@@ -629,7 +629,7 @@ int main() {
 		if (event.type == ALLEGRO_EVENT_TIMER) {
 			refreshPlayerMovement(&player, &tiles, tileset);
 			refreshEnemyMovement(&enemy, &player);
-			refreshProjectileState(playerShot, &projectileCount);
+			refreshProjectileState(playerShot, &projectileCount, cx);
 
 			refreshCamera(&cx, player);
 		
