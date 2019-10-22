@@ -1,13 +1,9 @@
 ﻿  PI-Allegro.c
-C:\Users\guigp\OneDrive\Área de Trabalho\PI-Allegro-master\PI-Allegro\PI-Allegro.c(106,13): warning C4013: 'sodium_init' indefinido; assumindo extern retornando int
-C:\Users\guigp\OneDrive\Área de Trabalho\PI-Allegro-master\PI-Allegro\PI-Allegro.c(190,42): warning C4013: 'randombytes_uniform' indefinido; assumindo extern retornando int
-C:\Users\guigp\OneDrive\Área de Trabalho\PI-Allegro-master\PI-Allegro\PI-Allegro.c(462,36): warning C4047: 'função': 'ALLEGRO_BITMAP **' difere em níveis de indireção de 'ALLEGRO_BITMAP *(*)[2]'
-C:\Users\guigp\OneDrive\Área de Trabalho\PI-Allegro-master\PI-Allegro\PI-Allegro.c(462,36): warning C4024: 'initplayer': tipos diferentes para parâmetro formal e real 2
-C:\Users\guigp\OneDrive\Área de Trabalho\PI-Allegro-master\PI-Allegro\PI-Allegro.c(463,32): warning C4047: 'função': 'ALLEGRO_BITMAP *' difere em níveis de indireção de 'ALLEGRO_BITMAP **'
-C:\Users\guigp\OneDrive\Área de Trabalho\PI-Allegro-master\PI-Allegro\PI-Allegro.c(463,32): warning C4024: 'initenemy': tipos diferentes para parâmetro formal e real 2
-C:\Users\guigp\OneDrive\Área de Trabalho\PI-Allegro-master\PI-Allegro\PI-Allegro.c(464,53): warning C4047: 'função': 'ALLEGRO_BITMAP *' difere em níveis de indireção de 'ALLEGRO_BITMAP **'
-C:\Users\guigp\OneDrive\Área de Trabalho\PI-Allegro-master\PI-Allegro\PI-Allegro.c(464,53): warning C4024: 'initenemyShooter': tipos diferentes para parâmetro formal e real 2
-C:\Users\guigp\OneDrive\Área de Trabalho\PI-Allegro-master\PI-Allegro\PI-Allegro.c(451,17): warning C4101: 'cosPE': variável local não referenciada
-C:\Users\guigp\OneDrive\Área de Trabalho\PI-Allegro-master\PI-Allegro\PI-Allegro.c(451,8): warning C4101: 'anglePE': variável local não referenciada
-C:\Users\guigp\OneDrive\Área de Trabalho\PI-Allegro-master\PI-Allegro\PI-Allegro.c(451,24): warning C4101: 'sinPE': variável local não referenciada
-  PI-Allegro.vcxproj -> C:\Users\guigp\OneDrive\Área de Trabalho\PI-Allegro-master\PI-Allegro\Debug\PI-Allegro.exe
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(123,13): warning C4013: 'sodium_init' undefined; assuming extern returning int
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(208,42): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(505,17): warning C4133: 'function': incompatible types - from 'ALLEGRO_FILE *' to 'FILE *const '
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(571,36): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[2]'
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(571,36): warning C4024: 'initplayer': different types for formal and actual parameter 2
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(630,41): warning C4047: 'function': 'tile *' differs in levels of indirection from 'tile (*)[2]'
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(630,41): warning C4024: 'refreshPlayerMovement': different types for formal and actual parameter 2
+  PI-Allegro.vcxproj -> C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe

@@ -10,7 +10,7 @@
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_primitives.h>
 
-#define FPS 60.0
+#define FPS 60
 #define windowWidth 800
 #define windowHeight 450
 #define worldWidth 1000
@@ -22,21 +22,31 @@
 #define projectileOffset 10
 #define projectileMax 3
 #define projectileDamage 10
-#define antiVirus 0
-#define antiBiotic 1
-#define antiMycotic 2
 #define targetPracticeLife 20
+#define tileSize 32
+#define mapSize 100
 #define PI 3.14159265
 #define SODIUM_STATIC
 
-#define backgroundL1 0
-#define backgroundL2 1
-#define foreground 2
-
-#define neutral 0
-#define shooting 1
-
-#define ufo 0
+enum {
+	antiVirus,
+	antiBiotic,
+	antiMycotic
+};
+enum {
+	backgroundL1,
+	backgroundL2,
+	foreground
+};
+enum {
+	neutral,
+	shooting
+};
+enum {
+	ground,
+	air,
+	roof
+};
 
 // Helkson
 #define Left 0
@@ -45,11 +55,13 @@
 
 struct sprite {
 	// Felipe
-	//ALLEGRO_BITMAP* spriteBitmap;
 	float x, y;
+	float x0, y0;
+	int tileX, tileY;
 	float width, height;
 	float life, maxLife;
 	int hitboxWidth, hitboxHeight;
+	float hbX, hbY;
 	int sprite;
 	int spriteChange;
 	int r;
@@ -58,7 +70,8 @@ struct sprite {
 	int selectedWeapon;
 	int currentDir;
 	bool isShooting;
-	bool jump;
+	bool onGround;
+	bool hitCeiling;
 	bool alive;
 
 	int dir;
@@ -83,6 +96,12 @@ struct projectile {
 	ALLEGRO_BITMAP* spriteBitmap;
 };
 
+struct tile {
+	//ALLEGRO_BITMAP* tileSprite;
+	bool isSolid;
+	int id;
+};
+
 ALLEGRO_DISPLAY* display = NULL;
 ALLEGRO_FONT* font = NULL;
 ALLEGRO_TIMER* timer = NULL;
@@ -95,11 +114,15 @@ ALLEGRO_BITMAP* stage[3];
 ALLEGRO_BITMAP* playerSprites[2];
 ALLEGRO_BITMAP* enemySprite;
 ALLEGRO_BITMAP* enemyShooterSprite;
+ALLEGRO_BITMAP* tileAtlas;
+ALLEGRO_FILE* txtmap;
+ALLEGRO_TRANSFORM camera;
 struct sprite player;
 struct projectile playerShot[projectileMax];
 struct sprite enemy;
 struct projectile enemyShot[25];
 struct sprite enemyShooter;
+struct tile tiles[2];
 
 int initialize() {
 
@@ -115,6 +138,7 @@ int initialize() {
 	al_init_primitives_addon();
 
 	timer = al_create_timer(1.0 / FPS);
+	al_set_new_display_flags(ALLEGRO_RESIZABLE);
 	display = al_create_display(windowWidth, windowHeight);
 	queue = al_create_event_queue();
 	font = al_load_font("Fonts/metal-slug.ttf", 13, 0);
@@ -192,13 +216,13 @@ void enemyRandomizer(struct sprite* e) {
 	section = randombytes_uniform(2);
 
 	if (section == 1) {
-		e->x = 550 + randombytes_uniform(201);
+		e->x = player.x + (100 + randombytes_uniform(201));
 	}
 	else {
-		e->x = 50 + randombytes_uniform(201);
+		e->x = player.x - (100 + randombytes_uniform(201));
 	}
 
-	e->y = 250 + randombytes_uniform(101);
+	e->y = 150 + randombytes_uniform(101);
 
 	e->selectedWeapon = randombytes_uniform(3);
 
@@ -236,7 +260,7 @@ void enemyShooterRandomizer(struct sprite* f) {
 }
 
 int initplayer(struct sprite* c, ALLEGRO_BITMAP* player[]) {
-	player[neutral] = al_load_bitmap("Img/alienNeutral.bmp");
+	player[neutral] = al_load_bitmap("Img/alienNeutral64.bmp");
 	//if (!c->spriteBitmap) {
 	//	fprintf(stderr, "Falha ao carregar imagem!\n");
 	//	return -1;
@@ -246,24 +270,25 @@ int initplayer(struct sprite* c, ALLEGRO_BITMAP* player[]) {
 	player[shooting] = al_load_bitmap("Img/alienShot.bmp");
 	al_convert_mask_to_alpha(player[shooting], al_map_rgb(255, 0, 255));
 
-	c->x = 366;
-	c->y = 50;
-	c->width = 68;
-	c->height = 45;
-	c->hitboxWidth = 68;
-	c->hitboxHeight = 45;
+	c->x = 8 * tileSize;
+	c->y = 7 * tileSize;
+	c->width = al_get_bitmap_width(player[neutral]);
+	c->height = al_get_bitmap_height(player[neutral]);
+	c->hitboxWidth = 2 * tileSize;
+	c->hitboxHeight = 2 * tileSize;
 	c->vel_x = 4.5;
 	c->dir = 5;
 	c->currentDir = Right;
 	c->selectedWeapon = 0;
-	c->jump = false;
+	c->onGround = false;
+	c->hitCeiling = false;
 
 	return 0;
 }
 
-int initenemy(struct sprite* e, ALLEGRO_BITMAP* enemy) {
-	enemySprite = al_load_bitmap("Img/miniufo.bmp");
-	al_convert_mask_to_alpha(enemySprite, al_map_rgb(255, 0, 255));
+int initenemy(struct sprite* e, ALLEGRO_BITMAP **enemy) {
+	*enemy = al_load_bitmap("Img/miniufo.bmp");
+	al_convert_mask_to_alpha(*enemy, al_map_rgb(255, 0, 255));
 
 	enemyRandomizer(e);
 
@@ -298,8 +323,6 @@ int initenemyShooter(struct sprite* f, ALLEGRO_BITMAP* enemyShooter) {
 }
 
 void actShoot(struct projectile* p, struct sprite* c) {
-	//c->spriteBitmap = al_load_bitmap("Img/alienShot.bmp");
-	//al_convert_mask_to_alpha(c->spriteBitmap, al_map_rgb(255, 0, 255));
 	c->sprite = shooting;
 
 	p->speed = projectileVelocity;
@@ -369,7 +392,7 @@ void Shooting(struct projectile* q, struct sprite* f, struct sprite* c) {
 	q->projectileTravel = true;
 }
 
-void refreshProjectileState(struct projectile p[], int* pCount) {
+void refreshProjectileState(struct projectile p[], int* pCount, int cx) {
 	int j;
 
 	for (j = 0; j < projectileMax; j++) {
@@ -378,7 +401,7 @@ void refreshProjectileState(struct projectile p[], int* pCount) {
 				p[j].speed += p[j].accel;
 			}
 
-			if ((p[j].x + p[j].width) >= 0 && p[j].x <= 800) {
+			if (p[j].x < cx + al_get_display_width(display) && p[j].x > cx) {
 				if (p[j].dir == Right)
 					p[j].x += p[j].speed;
 				else
@@ -392,26 +415,115 @@ void refreshProjectileState(struct projectile p[], int* pCount) {
 	}
 }
 
-void refreshMovementState(struct sprite* p) {
-	if (p->y >= 350) {
-		p->y = 350;
-		p->jump = false;
+void refreshPlayerMovement(struct sprite* p, struct tile t[], int m[mapSize / 2][mapSize / 2]) {
+	int botTile, btID, upTile, upID, ltTile, ltID, rtTile, rtID;
+	
+	p->hbX = (p->x + (p->width / 2)) - tileSize;
+	p->hbY = (p->y + (p->height / 2)) - tileSize;
+
+	p->x0 = p->x;
+	p->y0 = p->y;
+
+	p->tileX = p->hbX / tileSize;
+	p->tileY = p->hbY / tileSize;
+
+	botTile = p->tileY + 2;
+	btID = m[botTile][p->tileX + 1];
+
+	upTile = p->tileY;
+	upID = m[upTile][p->tileX + 1];
+	
+	ltTile = p->tileX;
+	ltID = m[p->tileY + 1][ltTile];
+	
+	rtTile = p->tileX + 2;
+	rtID = m[p->tileY + 1][rtTile];
+	
+	if (t[upID].isSolid && p->y >= upTile + tileSize && !p->hitCeiling && p->vel_y < 0) {
+		p->vel_y = 0;
+		p->hitCeiling = true;
+	}
+
+	if (t[btID].isSolid && p->vel_y >= 0 && p->y >= botTile - tileSize) {
+		p->onGround = true;
+		p->hitCeiling = false;
+		p->vel_y = 0;
+		p->y -= (int) p->y % tileSize;
 	}
 	else {
 		p->vel_y += gravity;
 		p->y += p->vel_y;
 	}
 
-	if (p->x <= 0) {
-		p->x = 1;
-	}
-
-	if (p->x >= 732) {
-		p->x = 731;
+	switch (p->dir) {
+	case Right:
+		if (!t[rtID].isSolid) {
+			player.x += player.vel_x;
+		}
+		else {
+			p->x = ((rtTile - 2.5) * tileSize) + 1;
+		}
+		break;
+	case Left:
+		if (!t[ltID].isSolid) {
+			player.x -= player.vel_x;
+		}
+		else {
+			p->x = ((ltTile + 0.5) * tileSize) - 1;
+		}
+		break;
 	}
 }
 
-int hitboxDetection(struct projectile* a, struct sprite b, int* hitCount) {
+void refreshEnemyMovement(struct sprite *e, struct sprite *p) {
+	if (e->x != p->hbX && e->alive) {
+		if (e->x > p->hbX) {
+			if (e->vel_x >= -1.8) {
+				e->vel_x -= 0.2;
+			}
+		}
+		else {
+			if (e->vel_x <= 1.8) {
+				e->vel_x += 0.2;
+			}
+		}
+
+		e->x += e->vel_x;// *cosPE;
+	}
+
+	if (e->y != p->hbY && e->alive) {
+		if (e->y > p->hbY) {
+			if (e->vel_y >= -1.8) {
+				e->vel_y -= 0.2;
+			}
+		}
+		else {
+			if (e->vel_y <= 1.8) {
+				e->vel_y += 0.2;
+			}
+		}
+		e->y += e->vel_y; //*sinPE;
+	}
+
+	if (p->hbX + p->hitboxWidth - 10 > e->x&& p->hbX < e->x + e->width - 10 && p->hbY + p->hitboxHeight + 10 > e->y&& p->hbY < e->y + e->height - 10) {
+		int i;
+		for (i = 0; i > -8; i--) {
+			if (e->vel_y > -8) {
+				e->vel_y--;
+			}
+		}
+	}
+}
+
+void refreshCamera(float* cx, /*float* cy,*/ struct sprite p) {
+	*cx = (player.x + player.width / 2) - al_get_display_width(display) / 2;
+
+	if (*cx < 0) {
+		*cx = 0;
+	}
+}
+
+int hitboxDetection(struct projectile* a, struct sprite b, int* hitCount, int *pCount) {
 	float xAxisPivotA, yAxisPivotA, xAxisPivotB, yAxisPivotB, rightA, leftA, downA, upA, rightB, leftB, downB, upB;
 	int i, hitI = -1;
 
@@ -438,6 +550,7 @@ int hitboxDetection(struct projectile* a, struct sprite b, int* hitCount) {
 					a[i].x = 0;
 					a[i].y = 0;
 					*hitCount += 1;
+					*pCount -= 1;
 					hitI = i;
 				}
 			}
@@ -446,20 +559,120 @@ int hitboxDetection(struct projectile* a, struct sprite b, int* hitCount) {
 	return hitI;
 }
 
+void exitGame(ALLEGRO_EVENT ev, bool *loop) {
+	switch (ev.type) {
+	case ALLEGRO_EVENT_DISPLAY_CLOSE:
+		*loop = false;
+		break;
+	case ALLEGRO_EVENT_KEY_DOWN:
+		if (ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
+			*loop = false;
+		}
+		break;
+	}
+}
+
+void createTileAtlas(void) {
+	tileAtlas = al_create_bitmap(64, 32);
+	al_set_target_bitmap(tileAtlas);
+	al_clear_to_color(al_map_rgb(0, 0, 0));
+	al_draw_rectangle(0, 0, 34, 34, al_map_rgb(255, 0, 0), 3);
+	al_draw_filled_rectangle(34, 0, 68, 34, al_map_rgb(255, 0, 0));
+	al_set_target_backbuffer(display);
+}
+
+void createTileSet(int *tileSet[]) {
+	ALLEGRO_FILE *file = al_fopen("Tiles/tilemap.txt", "r");
+	int i, j;
+
+	for (i = 0; i < (mapSize / 2); i++) {
+		for (j = 0; j < (mapSize / 2); j++) {
+			fscanf_s(file, "%d", &tileSet[i][j]);
+		}
+	}
+}
+
 int main() {
-	int i, projectileCount = 0, enemyProjectileCount = 0, enemyDmgGauge = 0, hit = 0, hitI = 0, hitII = 0, frameCount = 0, auxFrameCount = 0, killCount = 0;
-	float anglePE, cosPE, sinPE;
-	char enemyLifeGauge[5], kcText[15];
+	int i, j, projectileCount = 0, enemyProjectileCount = 0, enemyDmgGauge = 0, hit = 0, hitI = 0,  hitII = 0, frameCount = 0, auxFrameCount = 0, killCount = 0;
+	int tileset[(mapSize / 2)][(mapSize / 2)] = {
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	};
+
+	//float anglePE, cosPE, sinPE;
+	float cx = 0, cy = 0, w = 0, h = 0, anglePE, cosPE, sinPE;
+	char enemyLifeGauge[5], ptx[8], pty[8], kcText[15];
 	bool gameLoop = false, menuLoop = true, toggleStartText = false;
 
 	initialize();
 	initplayer(&player, &playerSprites);
 	initenemy(&enemy, &enemySprite);
 	initenemyShooter(&enemyShooter, &enemyShooterSprite);
+	createTileAtlas();
+	//createTileSet(&tileset);
+	//txtmap = al_fopen("Tiles/tilemap.txt", "r");
+	//for (i = 0; i < (mapSize / 2); i++) {
+	//	for (j = 0; j < (mapSize / 2); j++) {
+	//		fscanf_s(txtmap, "%d", &tileset/*[i][j]*/);
+	//	}
+	//}
+	tiles[ground].isSolid = true;
+	tiles[ground].id = ground;
+
+	tiles[air].isSolid = false;
+	tiles[air].id = air;
 
 	stage[backgroundL1] = al_load_bitmap("Img/backgroundLayer1.bmp");
 	stage[backgroundL2] = al_load_bitmap("Img/backgroundLayer2.bmp");
-	stage[foreground] = al_load_bitmap("Img/foreground2.bmp");
+	stage[foreground] = al_load_bitmap("Img/foreground.bmp");
 	al_convert_mask_to_alpha(stage[foreground], al_map_rgb(255, 0, 255));
 
 	al_clear_to_color(al_map_rgb(255, 255, 255));
@@ -478,21 +691,11 @@ int main() {
 		if (event.type == ALLEGRO_EVENT_TIMER) {
 			frameCount++;
 		}
-
-		switch (event.type) {
-		case ALLEGRO_EVENT_DISPLAY_CLOSE:
-			menuLoop = false;
-			break;
-		case ALLEGRO_EVENT_KEY_DOWN:
-			if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
-				menuLoop = false;
-			}
-			break;
-		}
+		exitGame(event, &menuLoop);
 
 		if (al_is_event_queue_empty(queue)) {
 			al_clear_to_color(al_map_rgb(0, 0, 0));
-			if (frameCount % 60 == 0) {
+			if (frameCount % (FPS / 2) == 0) {
 				toggleStartText = !toggleStartText;
 			}
 			if (toggleStartText) {
@@ -510,8 +713,14 @@ int main() {
 		al_wait_for_event(queue, &event);
 
 		if (event.type == ALLEGRO_EVENT_TIMER) {
+			refreshPlayerMovement(&player, &tiles, tileset);
+			refreshEnemyMovement(&enemy, &player);
+			refreshProjectileState(playerShot, &projectileCount, cx);
+
+			refreshCamera(&cx, player);
+		
 			if (player.isShooting) {
-				if (player.spriteChange >= 30) {
+				if (player.spriteChange >= FPS / 2) {
 					player.spriteChange = 0;
 					player.sprite = neutral;
 					player.isShooting = false;
@@ -534,7 +743,7 @@ int main() {
 			refreshProjectileState(playerShot, &projectileCount);
 			refreshProjectileState(enemyShot, &enemyProjectileCount);
 
-			hitI = hitboxDetection(playerShot, enemy, &hit);
+			hitI = hitboxDetection(playerShot, enemy, &hit, &projectileCount);
 			hitII = hitboxDetection(playerShot, enemyShooter, &hit);
 
 			projectileCount -= hit;
@@ -574,7 +783,7 @@ int main() {
 				}
 			}
 
-			if (!enemy.alive && frameCount - auxFrameCount >= 60) {
+			if (!enemy.alive && frameCount - auxFrameCount >= FPS) {
 				enemyRandomizer(&enemy);
 				enemyDmgGauge = 0;
 				enemy.alive = true;
@@ -610,7 +819,6 @@ int main() {
 			//absF(&cosPE);
 			//absF(&sinPE);
 			//absD(&anglePE);
-
 
 			if (enemy.x != player.x && enemy.alive) {
 				if (enemy.x > player.x) {
@@ -707,10 +915,10 @@ int main() {
 		if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
 			switch (event.keyboard.keycode) {
 			case ALLEGRO_KEY_UP:
-				if (!player.jump) {
+				if (player.onGround) {
 					player.vel_y = -8;
 					player.y--;
-					player.jump = true;
+					player.onGround = false;
 				}
 				break;
 			case ALLEGRO_KEY_LEFT:
@@ -750,8 +958,7 @@ int main() {
 			}
 		}
 
-		if (event.type == ALLEGRO_EVENT_KEY_UP)
-		{
+		if (event.type == ALLEGRO_EVENT_KEY_UP) {
 			switch (event.keyboard.keycode) {
 			case ALLEGRO_KEY_RIGHT:
 				if (player.dir == Right) {
@@ -766,29 +973,54 @@ int main() {
 			}
 		}
 
-		switch (event.type) {
-		case ALLEGRO_EVENT_DISPLAY_CLOSE:
-			gameLoop = false;
-			break;
-		case ALLEGRO_EVENT_KEY_DOWN:
-			if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
-				gameLoop = false;
-			}
-			break;
+		exitGame(event, &gameLoop);
+
+		if (event.type == ALLEGRO_EVENT_DISPLAY_RESIZE) {
+			al_acknowledge_resize(display);
 		}
 
 		if (al_is_event_queue_empty(queue)) {
 			al_clear_to_color(al_map_rgb(255, 255, 255));
-			al_draw_bitmap(stage[backgroundL1], 0, 0, 0);
-			al_draw_bitmap(stage[backgroundL2], 0, 240, 0);
-			al_draw_bitmap(stage[foreground], 0, 226, 0);
+			
+			al_identity_transform(&camera);
+			al_translate_transform(&camera, -cx * 0.05, -cy * 0.05);
+			al_use_transform(&camera);
 
-			if (enemy.alive) {
-				if (enemy.x < player.x) {
-					al_draw_tinted_bitmap(enemySprite, al_map_rgb(enemy.r, enemy.g, enemy.b), enemy.x, enemy.y, ALLEGRO_FLIP_HORIZONTAL);
-				}
-				else {
-					al_draw_tinted_bitmap(enemySprite, al_map_rgb(enemy.r, enemy.g, enemy.b), enemy.x, enemy.y, 0);
+			al_draw_bitmap(stage[backgroundL1], 0, 0, 0);
+			al_draw_bitmap(stage[backgroundL1], al_get_bitmap_width(stage[backgroundL1]), 0, ALLEGRO_FLIP_HORIZONTAL);
+
+			//al_identity_transform(&camera);
+			//al_use_transform(&camera);
+
+			al_identity_transform(&camera);
+			al_translate_transform(&camera, -cx * 0.35, -cy * 0.35);
+			al_use_transform(&camera);
+
+			al_draw_bitmap(stage[backgroundL2], 0, 240, 0);
+			al_draw_bitmap(stage[backgroundL2], al_get_bitmap_width(stage[backgroundL2]), 240, 0);
+
+			al_identity_transform(&camera);
+			al_translate_transform(&camera, -cx, -cy);
+			al_use_transform(&camera);
+
+			al_hold_bitmap_drawing(0);
+
+			al_draw_bitmap(stage[foreground], 0, 226, 0);
+			al_draw_bitmap(stage[foreground], al_get_bitmap_width(stage[foreground]), 226, ALLEGRO_FLIP_HORIZONTAL);
+			al_draw_bitmap(stage[foreground], 2 * al_get_bitmap_width(stage[foreground]), 226, 0);
+
+			for (i = 0; i < (mapSize / 2); i++) {
+				for (j = 0; j < (mapSize / 2); j++) {
+					switch (tileset[i][j]) {
+					case ground:
+						al_draw_filled_rectangle(j * tileSize, i * tileSize, j * tileSize + tileSize, i * tileSize + tileSize, al_map_rgb(255, 0, 0));
+						break;
+					case air:
+						al_draw_rectangle(j* tileSize, i* tileSize, j* tileSize + tileSize, i* tileSize + tileSize, al_map_rgb(255, 0, 0), 2);
+						break;
+					case roof:
+						break;
+					}
 				}
 			}
 
@@ -803,19 +1035,21 @@ int main() {
 
 			if (player.currentDir == Right) {
 				al_draw_bitmap(playerSprites[player.sprite], player.x, player.y, ALLEGRO_FLIP_HORIZONTAL);
+				al_draw_filled_rectangle(player.hbX, player.hbY, player.hbX + player.hitboxWidth, player.hbY + player.hitboxHeight, al_map_rgba(0, 0, 255, 50));
 			}
 			else {
 				al_draw_bitmap(playerSprites[player.sprite], player.x, player.y, 0);
+				al_draw_filled_rectangle(player.hbX, player.hbY, player.hbX + player.hitboxWidth, player.hbY + player.hitboxHeight, al_map_rgba(0, 0, 255, 50));
 			}
 
-			al_draw_filled_rectangle(windowWidth - (2 * (enemy.maxLife - enemyDmgGauge) + 50), 50, windowWidth - (enemy.life + 50), 62, al_map_rgb(255, 0, 0));
-			al_draw_filled_rectangle(windowWidth - 50, 50, windowWidth - (2 * enemy.life + 50), 62, al_map_rgb(0, 128, 0));
-			sprintf_s(enemyLifeGauge, sizeof(enemyLifeGauge), "%.0f", enemy.life);
-			al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth - 48, 42, 0, enemyLifeGauge);
-			sprintf_s(kcText, sizeof(kcText), "killcount = %d", killCount);
-			al_draw_text(font, al_map_rgb(255, 255, 255), 10, 5, 0, kcText);
-
-			al_draw_tinted_bitmap(playerShotTemplate, al_map_rgb(player.r, player.g, player.b), 0, 30, ALLEGRO_FLIP_HORIZONTAL);
+			if (enemy.alive) {
+				if (enemy.x < player.x) {
+					al_draw_tinted_bitmap(enemySprite, al_map_rgb(enemy.r, enemy.g, enemy.b), enemy.x, enemy.y, ALLEGRO_FLIP_HORIZONTAL);
+				}
+				else {
+					al_draw_tinted_bitmap(enemySprite, al_map_rgb(enemy.r, enemy.g, enemy.b), enemy.x, enemy.y, 0);
+				}
+			}
 
 			for (i = 0; i < projectileMax; i++) {
 				if (playerShot[i].projectileTravel) {
@@ -840,6 +1074,27 @@ int main() {
 					}
 				}
 			}
+			al_hold_bitmap_drawing(0);
+
+			al_identity_transform(&camera);
+			al_use_transform(&camera);
+
+			
+
+			
+
+			al_draw_filled_rectangle(windowWidth - (2 * (enemy.maxLife - enemyDmgGauge) + 50), 50, windowWidth - (enemy.life + 50), 62, al_map_rgb(255, 0, 0));
+			al_draw_filled_rectangle(windowWidth - 50, 50, windowWidth - (2 * enemy.life + 50), 62, al_map_rgb(0, 128, 0));
+			sprintf_s(enemyLifeGauge, sizeof(enemyLifeGauge), "%.0f", enemy.life);
+			al_draw_text(font, al_map_rgb(0, 0, 0), windowWidth - 48, 42, 0, enemyLifeGauge);
+			sprintf_s(kcText, sizeof(kcText), "killcount = %d", killCount);
+			al_draw_text(font, al_map_rgb(0, 0, 0), 10, 5, 0, kcText);
+			sprintf_s(ptx, sizeof(ptx), "X = %d", player.tileX);
+			al_draw_text(font, al_map_rgb(0, 0, 0), 10, 50, 0, ptx);
+			sprintf_s(pty, sizeof(pty), "Y = %d", player.tileY);
+			al_draw_text(font, al_map_rgb(0, 0, 0), 100, 50, 0, pty);
+
+			al_draw_tinted_bitmap(playerShotTemplate, al_map_rgb(player.r, player.g, player.b), 0, 30, ALLEGRO_FLIP_HORIZONTAL);
 
 			al_flip_display();
 		}
@@ -850,8 +1105,8 @@ int main() {
 	al_destroy_font(font);
 	al_uninstall_keyboard();
 	al_uninstall_mouse();
-	al_destroy_bitmap(playerSprites[0]);
-	al_destroy_bitmap(playerSprites[1]);
+	al_destroy_bitmap(playerSprites[neutral]);
+	al_destroy_bitmap(playerSprites[shooting]);
 	al_destroy_bitmap(enemySprite);
 	al_destroy_bitmap(enemyShooterSprite);
 	al_destroy_bitmap(stage[backgroundL1]);
