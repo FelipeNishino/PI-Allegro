@@ -1,0 +1,9 @@
+﻿  PI-Allegro.c
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(123,13): warning C4013: 'sodium_init' undefined; assuming extern returning int
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(208,42): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(505,17): warning C4133: 'function': incompatible types - from 'ALLEGRO_FILE *' to 'FILE *const '
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(571,36): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[2]'
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(571,36): warning C4024: 'initplayer': different types for formal and actual parameter 2
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(630,41): warning C4047: 'function': 'tile *' differs in levels of indirection from 'tile (*)[2]'
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(630,41): warning C4024: 'refreshPlayerMovement': different types for formal and actual parameter 2
+  PI-Allegro.vcxproj -> C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe
