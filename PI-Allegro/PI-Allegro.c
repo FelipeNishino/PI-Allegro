@@ -82,7 +82,7 @@ struct sprite {
 	int g;
 	int b;
 	int selectedWeapon;
-	int type;
+	int attack;
 	int currentDir;
 	bool isShooting;
 	bool onGround;
@@ -90,8 +90,11 @@ struct sprite {
 	bool alive;
 
 	int dir;
+	int count;
 	float vel_x;
 	float vel_y;
+	bool immortality;
+
 };
 
 struct projectile {
@@ -276,7 +279,7 @@ void enemyRandomizer(struct sprite* e) {
 //}
 
 int initplayer(struct sprite* c, ALLEGRO_BITMAP* player[]) {
-	player[neutral] = al_load_bitmap("Img/alienNeutral64.bmp");
+	player[neutral] = al_load_bitmap("Img/alienNeutral.bmp");
 	//if (!c->spriteBitmap) {
 	//	fprintf(stderr, "Falha ao carregar imagem!\n");
 	//	return -1;
@@ -298,6 +301,9 @@ int initplayer(struct sprite* c, ALLEGRO_BITMAP* player[]) {
 	c->selectedWeapon = 0;
 	c->onGround = false;
 	c->hitCeiling = false;
+	c->alive = true;
+	c->immortality = false;
+	c->life = 0;
 
 	return 0;
 }
@@ -307,8 +313,8 @@ int initenemy(struct sprite e[], ALLEGRO_BITMAP **enemy) {
 	*enemy = al_load_bitmap("Img/miniufo.bmp");
 	al_convert_mask_to_alpha(*enemy, al_map_rgb(255, 0, 255));
 
-	e[contact].type = contact;
-	e[shooter].type = shooter;
+	e[contact].attack = contact;
+	e[shooter].attack = shooter;
 
 	for (i = 0; i < enemyMax; i++) {
 		e[i].shotFC = 0;
@@ -475,7 +481,7 @@ void refreshPlayerMovement(struct sprite* p, struct tile t[], int m[mapSize / 2]
 		p->onGround = true;
 		p->hitCeiling = false;
 		p->vel_y = 0;
-		p->y -= (int) p->y % tileSize;
+		//p->y -= (int) p->y % tileSize;
 	}
 	else {
 		p->vel_y += gravity;
@@ -488,7 +494,7 @@ void refreshPlayerMovement(struct sprite* p, struct tile t[], int m[mapSize / 2]
 			player.x += player.vel_x;
 		}
 		else {
-			p->x = ((rtTile - 2.5) * tileSize) + 1;
+			//p->x = ((rtTile - 2.5) * tileSize) + 1;
 		}
 		break;
 	case Left:
@@ -496,7 +502,7 @@ void refreshPlayerMovement(struct sprite* p, struct tile t[], int m[mapSize / 2]
 			player.x -= player.vel_x;
 		}
 		else {
-			p->x = ((ltTile + 0.5) * tileSize) - 1;
+			//p->x = ((ltTile + 0.5) * tileSize) - 1;
 		}
 		break;
 	}
@@ -552,22 +558,17 @@ void refreshEnemyMovement(struct sprite *e, struct sprite *p) {
 		}
 		e->y += e->vel_y; //*sinPE;
 	}
-
-	if (p->hbX + p->hitboxWidth - 10 > e->x&& p->hbX < e->x + e->width - 10 && p->hbY + p->hitboxHeight + 10 > e->y&& p->hbY < e->y + e->height - 10) {
-		int i;
-		for (i = 0; i > -8; i--) {
-			if (e->vel_y > -8) {
-				e->vel_y--;
-			}
-		}
-	}
 }
 
-void refreshCamera(float* cx, /*float* cy,*/ struct sprite p) {
+void refreshCamera(float* cx, float* cy, struct sprite p) {
 	*cx = (player.x + player.width / 2) - al_get_display_width(display) / 2;
+	*cy = (player.y + player.height / 2) - al_get_display_height(display) / 2;
 
 	if (*cx < 0) {
 		*cx = 0;
+	}
+	if (*cy < 0) {
+		*cy = 0;
 	}
 }
 
@@ -592,7 +593,7 @@ void hitboxDetection(struct projectile* a, struct sprite b[], int* hitI[], int* 
 				downB = yAxisPivotB + b[j].hitboxHeight / 2;
 				upB = yAxisPivotB - b[j].hitboxHeight / 2;
 
-				if ((rightA > leftB&& rightA < rightB) || (leftA > leftB&& leftA < rightB)) {
+				if ((rightA > leftB&& rightA < rightB) || (leftA > leftB && leftA < rightB)) {
 					if ((upA < downB && upA > upB) || (downA > upB&& downA < downB)) {
 						a[i].projectileTravel = false;
 						a[i].x = 0;
@@ -612,6 +613,7 @@ void exitGame(ALLEGRO_EVENT ev, bool *loop, bool *exit) {
 	switch (ev.type) {
 	case ALLEGRO_EVENT_DISPLAY_CLOSE:
 		*loop = false;
+		*exit = true;
 		break;
 	case ALLEGRO_EVENT_KEY_DOWN:
 		if (ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
@@ -643,26 +645,26 @@ void createTileSet(int *tileSet[]) {
 }
 
 int main() {
-	int i, j, projectileCount = 0, enemyProjectileCount = 0, enemyDmgGauge = 0, hit = 0, hitI[2] = { 0, 0 }, hitII = 0, frameCount = 0, enemyDeadFC[enemyMax] = { 0, 0 }, killCount = 0;
+	int i, j, projectileCount = 0, enemyProjectileCount = 0, enemyDmgGauge = 0, hit = 0, hitI[2] = { 0, 0 }, hitII = 0, frameCount = 0, immortalityFC = 0, enemyDeadFC[enemyMax] = { 0, 0 }, killCount = 0;
 	int tileset[(mapSize / 2)][(mapSize / 2)] = {
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0},
-		{1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		{1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -758,6 +760,8 @@ int main() {
 		}
 
 		al_play_sample(sample, 0.1, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
+		initplayer(&player, &playerSprites);
+		initenemy(&enemy, &enemySprite);
 
 		while (gameLoop) {
 			ALLEGRO_EVENT event;
@@ -769,7 +773,7 @@ int main() {
 				refreshProjectileState(playerShot, &projectileCount, cx);
 				refreshEnemyProjectile(enemyShot, &enemyProjectileCount, cx);
 
-				refreshCamera(&cx, player);
+				refreshCamera(&cx, &cy, player);
 
 				if (player.isShooting) {
 					if (player.spriteChange >= FPS / 2) {
@@ -793,7 +797,7 @@ int main() {
 				}*/
 				
 				for (i = 0; i < enemyProjectileMax; i++) {
-					if (frameCount - enemy[i].shotFC >= FPS && enemy[i].type == shooter) {
+					if (frameCount - enemy[i].shotFC >= FPS && enemy[i].attack == shooter) {
 						if (!enemyShot[i].projectileTravel) {
 							enemyProjectileCount++;
 							eShoot(&enemyShot[i], &enemy[i], &player, frameCount);
@@ -828,6 +832,51 @@ int main() {
 						enemy[i].alive = true;
 					}
 				}
+
+				for (j = 0; j < enemyMax; j++) {
+					if (player.alive && player.hbX + player.width > enemy[j].x && player.hbX < enemy[j].x + enemy[j].width && player.hbY + player.height > enemy[j].y && player.hbY < enemy[j].y + enemy[j].height) {
+						if (!player.immortality) {
+							immortalityFC = frameCount;
+							for (i = 0; i > -8; i--) {
+								enemy[j].vel_y--;
+							}
+							player.life++;
+							player.immortality = true;
+						}
+
+						if (player.immortality && frameCount - immortalityFC >= (int)(1.5 * FPS)) {
+							player.immortality = false;
+						}
+
+						if (player.life >= 3) {
+							player.alive = false;
+							menuLoop = true;
+							gameLoop = false;
+						}
+					}
+				}
+				for (i = 0; i < 25; i++) {
+					if (player.alive && player.hbX + player.width > enemyShot[i].x && player.hbX < enemyShot[i].x + enemyShot[i].width && player.hbY + player.height > enemyShot[i].y&& player.hbY < enemy[i].y + enemy[i].height) {
+						if (!player.immortality) {
+							immortalityFC = frameCount;
+							enemyShot[i].projectileTravel = false;
+							enemyShot[i].y = 0;
+							player.life++;
+							player.immortality = true;
+						}
+
+						if (player.immortality && frameCount - immortalityFC >= (int)(1.5 * FPS)) {
+							player.immortality = false;
+						}
+
+						if (player.life >= 3) {
+							player.alive = false;
+							menuLoop = true;
+							gameLoop = false;
+						}
+					}
+				}
+
 				/*while (hit > 0) {
 					if (enemyShooter.selectedWeapon == playerShot[hitI].type) {
 						enemyShooter.life -= playerShot[0].damage + playerShot[0].damage * (randombytes_uniform(16) / 100.0);
@@ -938,7 +987,9 @@ int main() {
 
 				case ALLEGRO_KEY_S:
 					player.selectedWeapon++;
-					player.selectedWeapon = player.selectedWeapon % 3;
+					if (player.selectedWeapon > 2) {
+						player.selectedWeapon = 0;
+					}
 					break;
 
 				case ALLEGRO_KEY_X:
@@ -1009,7 +1060,7 @@ int main() {
 							al_draw_filled_rectangle(j * tileSize, i * tileSize, j * tileSize + tileSize, i * tileSize + tileSize, al_map_rgb(255, 0, 0));
 							break;
 						case air:
-							al_draw_rectangle(j* tileSize, i* tileSize, j* tileSize + tileSize, i* tileSize + tileSize, al_map_rgb(255, 0, 0), 2);
+							//al_draw_rectangle(j* tileSize, i* tileSize, j* tileSize + tileSize, i* tileSize + tileSize, al_map_rgb(255, 0, 0), 2);
 							break;
 						case roof:
 							break;
@@ -1028,11 +1079,11 @@ int main() {
 
 				if (player.currentDir == Right) {
 					al_draw_bitmap(playerSprites[player.sprite], player.x, player.y, ALLEGRO_FLIP_HORIZONTAL);
-					al_draw_filled_rectangle(player.hbX, player.hbY, player.hbX + player.hitboxWidth, player.hbY + player.hitboxHeight, al_map_rgba(0, 0, 255, 50));
+					//al_draw_filled_rectangle(player.hbX, player.hbY, player.hbX + player.hitboxWidth, player.hbY + player.hitboxHeight, al_map_rgba(0, 0, 255, 50));
 				}
 				else {
 					al_draw_bitmap(playerSprites[player.sprite], player.x, player.y, 0);
-					al_draw_filled_rectangle(player.hbX, player.hbY, player.hbX + player.hitboxWidth, player.hbY + player.hitboxHeight, al_map_rgba(0, 0, 255, 50));
+					//al_draw_filled_rectangle(player.hbX, player.hbY, player.hbX + player.hitboxWidth, player.hbY + player.hitboxHeight, al_map_rgba(0, 0, 255, 50));
 				}
 
 				for (i = 0; i < enemyMax; i++) {
@@ -1068,6 +1119,24 @@ int main() {
 				al_identity_transform(&camera);
 				al_use_transform(&camera);
 
+				switch ((int)player.life) {
+				case 0:
+					al_draw_filled_rectangle(10, 35, 20, 45, al_map_rgb(255, 0, 0));
+					al_draw_filled_rectangle(30, 35, 40, 45, al_map_rgb(255, 0, 0));
+					al_draw_filled_rectangle(50, 35, 60, 45, al_map_rgb(255, 0, 0));
+					break;
+				case 1:
+					al_draw_filled_rectangle(10, 35, 20, 45, al_map_rgb(255, 0, 0));
+					al_draw_filled_rectangle(30, 35, 40, 45, al_map_rgb(255, 0, 0));
+					al_draw_rectangle(50, 35, 60, 45, al_map_rgb(255, 0, 0), 2);
+					break;
+				case 2:
+					al_draw_filled_rectangle(10, 35, 20, 45, al_map_rgb(255, 0, 0));
+					al_draw_rectangle(30, 35, 40, 45, al_map_rgb(255, 0, 0), 2);
+					al_draw_rectangle(50, 35, 60, 45, al_map_rgb(255, 0, 0), 2);
+					break;
+				}
+
 				al_draw_filled_rectangle(windowWidth - (2 * (enemy[hitI[enemyI]].maxLife - enemyDmgGauge) + 50), 50, windowWidth - (enemy[hitI[enemyI]].life + 50), 62, al_map_rgb(255, 0, 0));
 				al_draw_filled_rectangle(windowWidth - 50, 50, windowWidth - (2 * enemy[hitI[enemyI]].life + 50), 62, al_map_rgb(0, 128, 0));
 				sprintf_s(enemyLifeGauge, sizeof(enemyLifeGauge), "%.0f", enemy[hitI[enemyI]].life);
@@ -1079,7 +1148,7 @@ int main() {
 				sprintf_s(pty, sizeof(pty), "Y = %d", player.tileY);
 				al_draw_text(font, al_map_rgb(0, 0, 0), 100, 50, 0, pty);
 
-				al_draw_tinted_bitmap(playerShotTemplate, al_map_rgb(player.r, player.g, player.b), 0, 30, ALLEGRO_FLIP_HORIZONTAL);
+				al_draw_tinted_bitmap(playerShotTemplate, al_map_rgb(player.r, player.g, player.b), al_get_bitmap_width(playerShotTemplate) + 20, 30, ALLEGRO_FLIP_HORIZONTAL);
 
 				al_flip_display();
 			}

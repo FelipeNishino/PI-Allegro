@@ -1,52 +1,27 @@
 ﻿  PI-Allegro.c
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(145,13): warning C4013: 'sodium_init' undefined; assuming extern returning int
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(230,42): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(414,16): warning C4047: '=': 'int' differs in levels of indirection from 'void *'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(602,28): warning C4047: '=': 'int *' differs in levels of indirection from 'int'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(603,23): warning C4047: '=': 'int *' differs in levels of indirection from 'int'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(640,17): warning C4133: 'function': incompatible types - from 'ALLEGRO_FILE *' to 'FILE *const '
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(706,36): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(706,36): warning C4024: 'initplayer': different types for formal and actual parameter 2
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(707,18): warning C4047: 'function': 'sprite *' differs in levels of indirection from 'sprite (*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(707,18): warning C4024: 'initenemy': different types for formal and actual parameter 1
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(767,42): warning C4047: 'function': 'tile *' differs in levels of indirection from 'tile (*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(767,42): warning C4024: 'refreshPlayerMovement': different types for formal and actual parameter 2
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(768,32): warning C4047: 'function': 'sprite *' differs in levels of indirection from 'sprite (*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(768,32): warning C4024: 'refreshEnemyMovement': different types for formal and actual parameter 1
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(805,39): warning C4047: 'function': 'sprite *' differs in levels of indirection from 'sprite (*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(805,39): warning C4024: 'hitboxDetection': different types for formal and actual parameter 2
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(805,46): warning C4047: 'function': 'int **' differs in levels of indirection from 'int (*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(805,46): warning C4024: 'hitboxDetection': different types for formal and actual parameter 3
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(701,47): warning C4101: 'cosPE': unreferenced local variable
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(701,38): warning C4101: 'anglePE': unreferenced local variable
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(701,54): warning C4101: 'sinPE': unreferenced local variable
-  LINK : C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe not found or not built by the last incremental link; performing full link
-LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
-libsodium.lib(blake2b-compress-ref.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(blake2b-compress-ref.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(blake2b-compress-ssse3.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(blake2b-compress-ssse3.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(blake2b-compress-sse41.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(blake2b-compress-sse41.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(generichash_blake2b.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(generichash_blake2b.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(blake2b-ref.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(blake2b-ref.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(blake2b-long.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(blake2b-long.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(argon2-core.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(argon2-core.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(argon2-fill-block-ref.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(argon2-fill-block-ref.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(argon2-fill-block-ssse3.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(argon2-fill-block-ssse3.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(verify.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(verify.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(scalarmult_curve25519.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(scalarmult_curve25519.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(x25519_ref10.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(x25519_ref10.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(onetimeauth_poly1305.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(onetimeauth_poly1305.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(poly1305_donna.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(poly1305_donna.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(randombytes.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(randombytes.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(randombytes_sysrandom.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(randombytes_sysrandom.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(runtime.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(runtime.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(core.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(core.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(utils.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(utils.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(stream_chacha20.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(stream_chacha20.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(chacha20_ref.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(chacha20_ref.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(chacha20_dolbeau-ssse3.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(chacha20_dolbeau-ssse3.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(stream_salsa20.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(stream_salsa20.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(salsa20_ref.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(salsa20_ref.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(salsa20_xmm6int-sse2.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(salsa20_xmm6int-sse2.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(core_salsa_ref.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(core_salsa_ref.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-libsodium.lib(ed25519_ref10.obj) : warning LNK4099: PDB 'libsodium.pdb' was not found with 'libsodium.lib(ed25519_ref10.obj)' or at 'C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\libsodium.pdb'; linking object as if no debug info
-  PI-Allegro.vcxproj -> C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(148,13): warning C4013: 'sodium_init' undefined; assuming extern returning int
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(233,42): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(420,16): warning C4047: '=': 'int' differs in levels of indirection from 'void *'
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(603,28): warning C4047: '=': 'int *' differs in levels of indirection from 'int'
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(604,23): warning C4047: '=': 'int *' differs in levels of indirection from 'int'
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(642,17): warning C4133: 'function': incompatible types - from 'ALLEGRO_FILE *' to 'FILE *const '
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(708,36): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[2]'
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(708,36): warning C4024: 'initplayer': different types for formal and actual parameter 2
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(709,18): warning C4047: 'function': 'sprite *' differs in levels of indirection from 'sprite (*)[2]'
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(709,18): warning C4024: 'initenemy': different types for formal and actual parameter 1
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(763,37): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[2]'
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(763,37): warning C4024: 'initplayer': different types for formal and actual parameter 2
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(764,19): warning C4047: 'function': 'sprite *' differs in levels of indirection from 'sprite (*)[2]'
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(764,19): warning C4024: 'initenemy': different types for formal and actual parameter 1
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(771,42): warning C4047: 'function': 'tile *' differs in levels of indirection from 'tile (*)[2]'
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(771,42): warning C4024: 'refreshPlayerMovement': different types for formal and actual parameter 2
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(772,32): warning C4047: 'function': 'sprite *' differs in levels of indirection from 'sprite (*)[2]'
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(772,32): warning C4024: 'refreshEnemyMovement': different types for formal and actual parameter 1
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(809,39): warning C4047: 'function': 'sprite *' differs in levels of indirection from 'sprite (*)[2]'
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(809,39): warning C4024: 'hitboxDetection': different types for formal and actual parameter 2
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(809,46): warning C4047: 'function': 'int **' differs in levels of indirection from 'int (*)[2]'
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(809,46): warning C4024: 'hitboxDetection': different types for formal and actual parameter 3
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(703,47): warning C4101: 'cosPE': unreferenced local variable
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(703,38): warning C4101: 'anglePE': unreferenced local variable
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(703,54): warning C4101: 'sinPE': unreferenced local variable
+  PI-Allegro.vcxproj -> C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe
