@@ -308,7 +308,7 @@ int initplayer(struct sprite* c, ALLEGRO_BITMAP* player[]) {
 	return 0;
 }
 
-int initenemy(struct sprite e[], ALLEGRO_BITMAP** enemy) {
+int initenemy(struct sprite e[], ALLEGRO_BITMAP **enemy) {
 	int i;
 	*enemy = al_load_bitmap("Img/miniufo.bmp");
 	al_convert_mask_to_alpha(*enemy, al_map_rgb(255, 0, 255));
@@ -398,7 +398,7 @@ void eShoot(struct projectile* p, struct sprite* e, struct sprite* c, int fc) {
 
 	p->dir = e->currentDir;
 
-	p->angle = atan2((-1.0 * e->y) + (-1.0 * c->hbY), (double)e->x + c->hbX);
+	p->angle = atan2((-1.0 * e->y) + (-1.0 * c->hbY), (double) e->x + c->hbX);
 	p->angle = p->angle * 180.0 / PI;
 	p->angle = (float)p->angle;
 	p->cos = cos(p->angle);
@@ -520,7 +520,7 @@ void refreshEnemyProjectile(struct projectile p[], int* pCount, int cx) {
 				else {
 					p[j].x += p[j].speed * p[j].cos;
 				}
-				p[j].y += p[j].speed * p[j].sin;
+					p[j].y += p[j].speed * p[j].sin;
 			}
 			else {
 				p[j].projectileTravel = false;
@@ -529,7 +529,7 @@ void refreshEnemyProjectile(struct projectile p[], int* pCount, int cx) {
 		}
 	}
 }
-void refreshEnemyMovement(struct sprite* e, struct sprite* p) {
+void refreshEnemyMovement(struct sprite *e, struct sprite *p) {
 	if (e->x != p->hbX && e->alive) {
 		if (e->x > p->hbX) {
 			if (e->vel_x >= -1.8) {
@@ -593,8 +593,8 @@ void hitboxDetection(struct projectile* a, struct sprite b[], int* hitI[], int* 
 				downB = yAxisPivotB + b[j].hitboxHeight / 2;
 				upB = yAxisPivotB - b[j].hitboxHeight / 2;
 
-				if ((rightA > leftB && rightA < rightB) || (leftA > leftB && leftA < rightB)) {
-					if ((upA < downB && upA > upB) || (downA > upB && downA < downB)) {
+				if ((rightA > leftB&& rightA < rightB) || (leftA > leftB && leftA < rightB)) {
+					if ((upA < downB && upA > upB) || (downA > upB&& downA < downB)) {
 						a[i].projectileTravel = false;
 						a[i].x = 0;
 						a[i].y = 0;
@@ -609,7 +609,7 @@ void hitboxDetection(struct projectile* a, struct sprite b[], int* hitI[], int* 
 	}
 }
 
-void exitGame(ALLEGRO_EVENT ev, bool* loop, bool* exit) {
+void exitGame(ALLEGRO_EVENT ev, bool *loop, bool *exit) {
 	switch (ev.type) {
 	case ALLEGRO_EVENT_DISPLAY_CLOSE:
 		*loop = false;
@@ -633,8 +633,8 @@ void createTileAtlas(void) {
 	al_set_target_backbuffer(display);
 }
 
-void createTileSet(int* tileSet[]) {
-	ALLEGRO_FILE* file = al_fopen("Tiles/tilemap.txt", "r");
+void createTileSet(int *tileSet[]) {
+	ALLEGRO_FILE *file = al_fopen("Tiles/tilemap.txt", "r");
 	int i, j;
 
 	for (i = 0; i < (mapSize / 2); i++) {
@@ -856,7 +856,7 @@ int main() {
 					}
 				}
 				for (i = 0; i < 25; i++) {
-					if (player.alive && player.hbX + player.width > enemyShot[i].x && player.hbX < enemyShot[i].x + enemyShot[i].width && player.hbY + player.height > enemyShot[i].y && player.hbY < enemy[i].y + enemy[i].height) {
+					if (player.alive && player.hbX + player.width > enemyShot[i].x && player.hbX < enemyShot[i].x + enemyShot[i].width && player.hbY + player.height > enemyShot[i].y&& player.hbY < enemy[i].y + enemy[i].height) {
 						if (!player.immortality) {
 							immortalityFC = frameCount;
 							enemyShot[i].projectileTravel = false;
