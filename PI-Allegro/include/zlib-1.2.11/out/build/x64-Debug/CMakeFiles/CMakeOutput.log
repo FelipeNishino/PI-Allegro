@@ -1,0 +1,65 @@
+The system is: Windows - 10.0.17763 - AMD64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.23.28105/bin/HostX64/x64/cl.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+Microsoft (R) C/C++ Optimizing Compiler Version 19.23.28106.4 for x64
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+CMakeCCompilerId.c
+Microsoft (R) Incremental Linker Version 14.23.28106.4
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCCompilerId.exe 
+CMakeCCompilerId.obj 
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CMakeCCompilerId.exe"
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CMakeCCompilerId.obj"
+
+The C compiler identification is MSVC, found in "C:/Users/keeee/source/repos/PI-Allegro/PI-Allegro/include/zlib-1.2.11/out/build/x64-Debug/CMakeFiles/3.15.19080502-MSVC_2/CompilerIdC/CMakeCCompilerId.exe"
+
+Determining if the C compiler works passed with the following output:
+Change Dir: C:/Users/keeee/source/repos/PI-Allegro/PI-Allegro/include/zlib-1.2.11/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_f633c && [1/2] Building C object CMakeFiles\cmTC_f633c.dir\testCCompiler.c.obj
+[2/2] Linking C executable cmTC_f633c.exe
+
+
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: C:/Users/keeee/source/repos/PI-Allegro/PI-Allegro/include/zlib-1.2.11/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_aba1f && [1/2] Building C object CMakeFiles\cmTC_aba1f.dir\CMakeCCompilerABI.c.obj
+[2/2] Linking C executable cmTC_aba1f.exe
+
+
+
+Determining if the include file sys/types.h exists passed with the following output:
+Change Dir: C:/Users/keeee/source/repos/PI-Allegro/PI-Allegro/include/zlib-1.2.11/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_aaaa6 && [1/2] Building C object CMakeFiles\cmTC_aaaa6.dir\CheckIncludeFile.c.obj
+[2/2] Linking C executable cmTC_aaaa6.exe
+
+
+
+Determining if the include file stdint.h exists passed with the following output:
+Change Dir: C:/Users/keeee/source/repos/PI-Allegro/PI-Allegro/include/zlib-1.2.11/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_505ed && [1/2] Building C object CMakeFiles\cmTC_505ed.dir\CheckIncludeFile.c.obj
+[2/2] Linking C executable cmTC_505ed.exe
+
+
+
+Determining if the include file stddef.h exists passed with the following output:
+Change Dir: C:/Users/keeee/source/repos/PI-Allegro/PI-Allegro/include/zlib-1.2.11/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_e8abd && [1/2] Building C object CMakeFiles\cmTC_e8abd.dir\CheckIncludeFile.c.obj
+[2/2] Linking C executable cmTC_e8abd.exe
+
+
+

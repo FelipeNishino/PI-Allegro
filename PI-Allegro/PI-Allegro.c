@@ -45,6 +45,18 @@ enum {
 	air,
 	roof
 };
+enum {
+	projectileI,
+	enemyI
+};
+enum {
+	contact,
+	shooter
+};
+enum {
+	friendly,
+	foe
+};
 
 // Helkson
 #define Left 0
@@ -89,6 +101,7 @@ struct projectile {
 	int r;
 	int g;
 	int b;
+	int origin;
 	bool projectileTravel;
 	bool projectileHit;
 };
@@ -286,6 +299,8 @@ void actShoot(struct projectile* p, struct sprite* c) {
 	p->hitboxWidth = 46;
 	p->hitboxHeight = 22;
 
+	p->origin = friendly;
+
 	p->dir = c->currentDir;
 
 	if (p->dir == Right) {
@@ -304,6 +319,49 @@ void actShoot(struct projectile* p, struct sprite* c) {
 	p->y = p->y0;
 
 	c->isShooting = true;
+	p->projectileTravel = true;
+}
+
+void eShoot(struct projectile* p, struct sprite* e, struct sprite* c, int fc) {
+	/*p->spriteBitmap = al_load_bitmap("Img/alienShot.bmp");
+	al_convert_mask_to_alpha(p->spriteBitmap, al_map_rgb(255, 0, 255));*/
+	e->shotFC = fc;
+	p->speed = enemyProjectileVelocity;
+
+	p->width = 20;
+	p->height = 20;
+
+	p->hitboxWidth = 20;
+	p->hitboxHeight = 20;
+	
+	p->origin = foe;
+
+	p->dir = e->currentDir;
+
+	p->angle = atan2((-1.0 * e->y) + (-1.0 * c->hbY), (double) e->x + c->hbX);
+	p->angle = p->angle * 180.0 / PI;
+	p->angle = (float)p->angle;
+	p->cos = cos(p->angle);
+	p->sin = sin(p->angle);
+	absF(&p->cos);
+	absF(&p->sin);
+	//absD(&angle);
+
+	if (p->dir == Right) {
+		p->x0 = e->x;// + e->hitboxWidth;
+		p->y0 = e->y;// + projectileOffset;
+	}
+	else {
+		p->x0 = e->x;// - p->hitboxWidth;
+		p->y0 = e->y;// + projectileOffset;
+	}
+
+	p->damage = projectileDamage;
+	p->type = NULL;// e->selectedWeapon;
+
+	p->x = p->x0;
+	p->y = p->y0;
+
 	p->projectileTravel = true;
 }
 
@@ -438,35 +496,67 @@ void refreshCamera(float* cx, /*float* cy,*/ struct sprite p) {
 	}
 }
 
-int hitboxDetection(struct projectile* a, struct sprite b, int* hitCount, int *pCount) {
+void hitboxDetection(struct projectile* a, struct sprite b[], struct sprite *c, int* hitI[], int* hitCount, int* pCount) {
 	float xAxisPivotA, yAxisPivotA, xAxisPivotB, yAxisPivotB, rightA, leftA, downA, upA, rightB, leftB, downB, upB;
-	int i, hitI = -1;
+	int i, j;
+	if (a[0].origin == friendly) {
+		for (j = 0; j < enemyMax; j++) {
+			for (i = 0; i < projectileMax; i++) {
+				if (a[i].projectileTravel) {
+					xAxisPivotA = a[i].x + a[i].width / 2;
+					yAxisPivotA = a[i].y + a[i].height / 2;
+					xAxisPivotB = b[j].x + b[j].width / 2;
+					yAxisPivotB = b[j].y + b[j].height / 2;
 
-	for (i = 0; i < projectileMax; i++) {
-		if (a[i].projectileTravel) {
-			xAxisPivotA = a[i].x + a[i].width / 2;
-			yAxisPivotA = a[i].y + a[i].height / 2;
-			xAxisPivotB = b.x + b.width / 2;
-			yAxisPivotB = b.y + b.height / 2;
+					rightA = xAxisPivotA + a[i].hitboxWidth / 2;
+					leftA = xAxisPivotA - a[i].hitboxWidth / 2;
+					downA = yAxisPivotA + a[i].hitboxHeight / 2;
+					upA = yAxisPivotA - a[i].hitboxHeight / 2;
 
-			rightA = xAxisPivotA + a[i].hitboxWidth / 2;
-			leftA = xAxisPivotA - a[i].hitboxWidth / 2;
-			downA = yAxisPivotA + a[i].hitboxHeight / 2;
-			upA = yAxisPivotA - a[i].hitboxHeight / 2;
+					rightB = xAxisPivotB + b[j].hitboxWidth / 2;
+					leftB = xAxisPivotB - b[j].hitboxWidth / 2;
+					downB = yAxisPivotB + b[j].hitboxHeight / 2;
+					upB = yAxisPivotB - b[j].hitboxHeight / 2;
 
-			rightB = xAxisPivotB + b.hitboxWidth / 2;
-			leftB = xAxisPivotB - b.hitboxWidth / 2;
-			downB = yAxisPivotB + b.hitboxHeight / 2;
-			upB = yAxisPivotB - b.hitboxHeight / 2;
+					if ((rightA > leftB&& rightA < rightB) || (leftA > leftB&& leftA < rightB)) {
+						if ((upA < downB && upA > upB) || (downA > upB&& downA < downB)) {
+							a[i].projectileTravel = false;
+							a[i].x = 0;
+							a[i].y = 0;
+							*hitCount += 1;
+							*pCount -= 1;
+							hitI[projectileI] = i;
+							hitI[enemyI] = j;
+						}
+					}
+				}
+			}
+		}
+	}
+	else {		
+		for (i = 0; i < enemyProjectileMax; i++) {
+			if (a[i].projectileTravel) {
+				xAxisPivotA = a[i].x + a[i].width / 2;
+				yAxisPivotA = a[i].y + a[i].height / 2;
+				xAxisPivotB = c->x + c->width / 2;
+				yAxisPivotB = c->y + c->height / 2;
 
-			if ((rightA > leftB && rightA < rightB) || (leftA > leftB && leftA < rightB)) {
-				if ((upA < downB && upA > upB) || (downA > upB && downA < downB)) {
-					a[i].projectileTravel = false;
-					a[i].x = 0;
-					a[i].y = 0;
-					*hitCount += 1;
-					*pCount -= 1;
-					hitI = i;
+				rightA = xAxisPivotA + a[i].hitboxWidth / 2;
+				leftA = xAxisPivotA - a[i].hitboxWidth / 2;
+				downA = yAxisPivotA + a[i].hitboxHeight / 2;
+				upA = yAxisPivotA - a[i].hitboxHeight / 2;
+
+				rightB = xAxisPivotB + c->hitboxWidth / 2;
+				leftB = xAxisPivotB - c->hitboxWidth / 2;
+				downB = yAxisPivotB + c->hitboxHeight / 2;
+				upB = yAxisPivotB - c->hitboxHeight / 2;
+
+				if ((rightA > leftB && rightA < rightB) || (leftA > leftB && leftA < rightB)) {
+					if ((upA < downB && upA > upB) || (downA > upB&& downA < downB)) {
+						a[i].projectileTravel = false;
+						a[i].x = 0;
+						a[i].y = 0;
+					}
 				}
 			}
 		}
@@ -496,15 +586,29 @@ void createTileAtlas(void) {
 	al_set_target_backbuffer(display);
 }
 
-void createTileSet(int *tileSet[]) {
-	ALLEGRO_FILE *file = al_fopen("Tiles/tilemap.txt", "r");
+void createTileSet(int **mat) {
 	int i, j;
 
-	for (i = 0; i < (mapSize / 2); i++) {
-		for (j = 0; j < (mapSize / 2); j++) {
-			fscanf_s(file, "%d", &tileSet[i][j]);
-		}
+	mat = malloc(mapSize * sizeof(int*));
+	
+	for (i = 0; i < mapSize; ++i) {
+		mat[i] = malloc(mapSize * sizeof(int));
 	}
+
+	FILE* file;
+	file = fopen("Tiles/tilemap.txt", "r");
+
+	for (i = 0; i < mapSize; i++)
+	{
+		for (j = 0; j < mapSize; j++)
+		{
+			if (!fscanf(file, "%d", &mat[i][j]))
+				break;
+			printf("%d\n", mat[i][j]);
+		}
+
+	}
+	fclose(file);
 }
 
 int main() {
@@ -565,8 +669,8 @@ int main() {
 	//float anglePE, cosPE, sinPE;
 	float cx = 0, cy = 0, w = 0, h = 0;
 	char enemyLifeGauge[5], ptx[8], pty[8], kcText[15];
-	bool gameLoop = false, menuLoop = true, toggleStartText = false;
-
+	bool gameLoop = false, menuLoop = true, toggleStartText = false, exit = false;
+	int** tilemapasd;
 	initialize();
 	initplayer(&player, &playerSprites);
 	initenemy(&enemy, &enemySprite);
@@ -588,7 +692,7 @@ int main() {
 	stage[backgroundL2] = al_load_bitmap("Img/backgroundLayer2.bmp");
 	stage[foreground] = al_load_bitmap("Img/foreground.bmp");
 	al_convert_mask_to_alpha(stage[foreground], al_map_rgb(255, 0, 255));
-
+	createTileSet(&tilemapasd);
 	al_clear_to_color(al_map_rgb(255, 255, 255));
 
 	while (menuLoop) {
@@ -642,7 +746,7 @@ int main() {
 				else player.spriteChange++;
 			}
 
-			hitI = hitboxDetection(playerShot, enemy, &hit, &projectileCount);
+				hitboxDetection(playerShot, &enemy, &player, &hitI, &hit, &projectileCount);
 
 			while (hit > 0) {
 				if (enemy.selectedWeapon == playerShot[hitI].type) {
