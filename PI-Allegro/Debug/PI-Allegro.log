@@ -1,56 +1,27 @@
 ﻿  PI-Allegro.c
-<<<<<<< HEAD
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(148,13): warning C4013:  'sodium_init' undefined; assuming extern returning int
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(233,42): warning C4013:  'randombytes_uniform' undefined; assuming extern returning int
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(420,16): warning C4047:  '=': 'int' differs in levels of indirection from 'void *'
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(603,28): warning C4047:  '=': 'int *' differs in levels of indirection from 'int'
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(604,23): warning C4047:  '=': 'int *' differs in levels of indirection from 'int'
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(642,17): warning C4133:  'function': incompatible types - from 'ALLEGRO_FILE *' to 'FILE *const '
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(708,36): warning C4047:  'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[2]'
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(708,36): warning C4024:  'initplayer': different types for formal and actual parameter 2
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(709,18): warning C4047:  'function': 'sprite *' differs in levels of indirection from 'sprite (*)[2]'
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(709,18): warning C4024:  'initenemy': different types for formal and actual parameter 1
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(763,37): warning C4047:  'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[2]'
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(763,37): warning C4024:  'initplayer': different types for formal and actual parameter 2
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(764,19): warning C4047:  'function': 'sprite *' differs in levels of indirection from 'sprite (*)[2]'
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(764,19): warning C4024:  'initenemy': different types for formal and actual parameter 1
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(771,42): warning C4047:  'function': 'tile *' differs in levels of indirection from 'tile (*)[2]'
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(771,42): warning C4024:  'refreshPlayerMovement': different types for formal and actual parameter 2
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(772,32): warning C4047:  'function': 'sprite *' differs in levels of indirection from 'sprite (*)[2]'
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(772,32): warning C4024:  'refreshEnemyMovement': different types for formal and actual parameter 1
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(809,39): warning C4047:  'function': 'sprite *' differs in levels of indirection from 'sprite (*)[2]'
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(809,39): warning C4024:  'hitboxDetection': different types for formal and actual parameter 2
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(809,46): warning C4047:  'function': 'int **' differs in levels of indirection from 'int (*)[2]'
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(809,46): warning C4024:  'hitboxDetection': different types for formal and actual parameter 3
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(703,47): warning C4101:  'cosPE': unreferenced local variable
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(703,38): warning C4101:  'anglePE': unreferenced local variable
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(703,54): warning C4101:  'sinPE': unreferenced local variable
-  PI-Allegro.vcxproj -> C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe
-=======
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(148,13): warning C4013: 'sodium_init' undefined; assuming extern returning int
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(233,42): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(420,16): warning C4047: '=': 'int' differs in levels of indirection from 'void *'
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(603,28): warning C4047: '=': 'int *' differs in levels of indirection from 'int'
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(604,23): warning C4047: '=': 'int *' differs in levels of indirection from 'int'
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(642,17): warning C4133: 'function': incompatible types - from 'ALLEGRO_FILE *' to 'FILE *const '
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(708,36): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[2]'
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(708,36): warning C4024: 'initplayer': different types for formal and actual parameter 2
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(709,18): warning C4047: 'function': 'sprite *' differs in levels of indirection from 'sprite (*)[2]'
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(709,18): warning C4024: 'initenemy': different types for formal and actual parameter 1
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(763,37): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[2]'
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(763,37): warning C4024: 'initplayer': different types for formal and actual parameter 2
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(764,19): warning C4047: 'function': 'sprite *' differs in levels of indirection from 'sprite (*)[2]'
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(764,19): warning C4024: 'initenemy': different types for formal and actual parameter 1
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(771,42): warning C4047: 'function': 'tile *' differs in levels of indirection from 'tile (*)[2]'
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(771,42): warning C4024: 'refreshPlayerMovement': different types for formal and actual parameter 2
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(772,32): warning C4047: 'function': 'sprite *' differs in levels of indirection from 'sprite (*)[2]'
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(772,32): warning C4024: 'refreshEnemyMovement': different types for formal and actual parameter 1
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(809,39): warning C4047: 'function': 'sprite *' differs in levels of indirection from 'sprite (*)[2]'
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(809,39): warning C4024: 'hitboxDetection': different types for formal and actual parameter 2
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(809,46): warning C4047: 'function': 'int **' differs in levels of indirection from 'int (*)[2]'
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(809,46): warning C4024: 'hitboxDetection': different types for formal and actual parameter 3
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(703,47): warning C4101: 'cosPE': unreferenced local variable
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(703,38): warning C4101: 'anglePE': unreferenced local variable
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(703,54): warning C4101: 'sinPE': unreferenced local variable
-  PI-Allegro.vcxproj -> C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe
->>>>>>> 343c64da7778b4d7030e53539f65c7e2f35a9b67
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(148,13): warning C4013: 'sodium_init' indefinido; assumindo extern retornando int
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(233,42): warning C4013: 'randombytes_uniform' indefinido; assumindo extern retornando int
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(420,16): warning C4047: '=': 'int' difere em níveis de indireção de 'void *'
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(603,28): warning C4047: '=': 'int *' difere em níveis de indireção de 'int'
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(604,23): warning C4047: '=': 'int *' difere em níveis de indireção de 'int'
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(642,17): warning C4133: 'função': tipos incompatíveis - de 'ALLEGRO_FILE *' para 'FILE *const '
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(708,36): warning C4047: 'função': 'ALLEGRO_BITMAP **' difere em níveis de indireção de 'ALLEGRO_BITMAP *(*)[2]'
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(708,36): warning C4024: 'initplayer': tipos diferentes para parâmetro formal e real 2
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(709,18): warning C4047: 'função': 'sprite *' difere em níveis de indireção de 'sprite (*)[2]'
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(709,18): warning C4024: 'initenemy': tipos diferentes para parâmetro formal e real 1
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(763,37): warning C4047: 'função': 'ALLEGRO_BITMAP **' difere em níveis de indireção de 'ALLEGRO_BITMAP *(*)[2]'
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(763,37): warning C4024: 'initplayer': tipos diferentes para parâmetro formal e real 2
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(764,19): warning C4047: 'função': 'sprite *' difere em níveis de indireção de 'sprite (*)[2]'
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(764,19): warning C4024: 'initenemy': tipos diferentes para parâmetro formal e real 1
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(771,42): warning C4047: 'função': 'tile *' difere em níveis de indireção de 'tile (*)[2]'
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(771,42): warning C4024: 'refreshPlayerMovement': tipos diferentes para parâmetro formal e real 2
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(772,32): warning C4047: 'função': 'sprite *' difere em níveis de indireção de 'sprite (*)[2]'
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(772,32): warning C4024: 'refreshEnemyMovement': tipos diferentes para parâmetro formal e real 1
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(809,39): warning C4047: 'função': 'sprite *' difere em níveis de indireção de 'sprite (*)[2]'
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(809,39): warning C4024: 'hitboxDetection': tipos diferentes para parâmetro formal e real 2
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(809,46): warning C4047: 'função': 'int **' difere em níveis de indireção de 'int (*)[2]'
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(809,46): warning C4024: 'hitboxDetection': tipos diferentes para parâmetro formal e real 3
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(703,47): warning C4101: 'cosPE': variável local não referenciada
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(703,38): warning C4101: 'anglePE': variável local não referenciada
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(703,54): warning C4101: 'sinPE': variável local não referenciada
+  PI-Allegro.vcxproj -> C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe
