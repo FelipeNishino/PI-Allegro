@@ -154,7 +154,7 @@ typedef struct tile {
 	int id;
 } tile;
 
-typedef struct objective {
+typedef struct objective{
 	int count;
 	int type;
 	//int stage;
@@ -485,7 +485,7 @@ void refreshProjectileState(projectile p[], projectile e[], entity c, int* cpCou
 	}
 }
 
-void refreshPlayerMovement(entity* p, tile t[], int** m) {
+void refreshPlayerMovement(entity* p, tile t[], int **m) {
 	int botTile, btID, upTile, upID, ltTile, ltID, rtTile, rtID;
 
 	p->hbX = (p->x + (p->width / 2)) - p->hbWidth / 2;
@@ -537,7 +537,7 @@ void refreshPlayerMovement(entity* p, tile t[], int** m) {
 		p->onGround = true;
 		p->hitCeiling = false;
 		p->vel_y = 0;
-		p->hbY -= (int)p->hbY % (tileSize * (p->hbHeight / tileSize));
+		p->hbY -= (int) p->hbY % (tileSize * (p->hbHeight / tileSize));
 		p->y = p->hbY - (p->height - p->hbHeight);
 	}
 	else {
@@ -651,7 +651,7 @@ void hitboxDetection(projectile* a, entity e[], entity* p, objective* kc, int* h
 								e[j].vel_y = 0;
 								e[j].life = 0;
 								edFC[j] = *fc;
-								if (e[j].attack == kc->type) {
+								if (e[j].attack == kc->type){
 									kc->count -= 1;
 								}
 							}
@@ -889,11 +889,11 @@ int main() {
 			fopen_s(&file, "Tiles/tilemap1.txt", "r");
 
 			switch (stageSelect) {
-			case 1:
-				break;
-			case 2:
-				fopen_s(&file, "Tiles/tilemap2.txt", "r");
-				break;
+				case 1:
+					break;
+				case 2:
+					fopen_s(&file, "Tiles/tilemap2.txt", "r");
+					break;
 			}
 
 			for (i = 0; i < mapSize; i++) {
@@ -929,7 +929,7 @@ int main() {
 				}
 
 				for (j = 0; j < enemyMax; j++) {
-					if (enemy[j].attack == shooter) {
+					if (enemy[j].attack == shooter)	{
 						for (i = 0; i < enemyProjectileMax; i++) {
 							if (frameCount - enemy[j].shotFC >= FPS) {
 								if (!enemyShot[i].projectileTravel) {
@@ -1010,19 +1010,19 @@ int main() {
 
 
 				switch (stageSelect) {
-				case 1:
-					if (killCount.count == 0) {
-						menuLoop = true;
-						gameLoop = false;
-					}
-					break;
-				case 2:
-					endurance.count--;
-					if (endurance.count == 0) {
-						menuLoop = true;
-						gameLoop = false;
-					}
-					break;
+					case 1:
+						if (killCount.count == 0) {
+							menuLoop = true;
+							gameLoop = false;
+						}
+						break;
+					case 2:
+						endurance.count--;
+						if (endurance.count == 0) {
+							menuLoop = true;
+							gameLoop = false;
+						}
+						break;
 				}
 
 				setSpriteColor(&player);
@@ -1206,14 +1206,14 @@ int main() {
 				al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth - 48, 42, 0, enemyLifeGauge);
 
 				switch (stageSelect) {
-				case 1:
-					sprintf_s(objText, sizeof(objText), "Shooters left = %d", killCount.count);
-					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 5, 0, objText);
-					break;
-				case 2:
-					sprintf_s(objText, sizeof(objText), "survive = %d", endurance.count);
-					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 5, 0, objText);
-					break;
+					case 1:
+						sprintf_s(objText, sizeof(objText), "Shooters left = %d", killCount.count);
+						al_draw_text(font, al_map_rgb(255, 255, 255), 10, 5, 0, objText);
+						break;
+					case 2:
+						sprintf_s(objText, sizeof(objText), "survive = %d", endurance.count);
+						al_draw_text(font, al_map_rgb(255, 255, 255), 10, 5, 0, objText);
+						break;
 				}
 
 
@@ -1252,4 +1252,3 @@ int main() {
 }
 
 //font by everiux365
-
