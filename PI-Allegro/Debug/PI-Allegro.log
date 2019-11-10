@@ -1,31 +1,33 @@
 ﻿  PI-Allegro.c
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(181,13): warning C4013: 'sodium_init' undefined; assuming extern returning int
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(266,42): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(606,29): warning C4047: '=': 'int *' differs in levels of indirection from 'int'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(607,24): warning C4047: '=': 'int *' differs in levels of indirection from 'int'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(796,36): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(796,36): warning C4024: 'initplayer': different types for formal and actual parameter 2
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(797,18): warning C4047: 'function': 'entity *' differs in levels of indirection from 'entity (*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(797,18): warning C4024: 'initenemy': different types for formal and actual parameter 1
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(850,37): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(850,37): warning C4024: 'initplayer': different types for formal and actual parameter 2
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(851,19): warning C4047: 'function': 'entity *' differs in levels of indirection from 'entity (*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(851,19): warning C4024: 'initenemy': different types for formal and actual parameter 1
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(858,42): warning C4047: 'function': 'tile *' differs in levels of indirection from 'tile (*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(858,42): warning C4024: 'refreshPlayerMovement': different types for formal and actual parameter 2
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(859,32): warning C4047: 'function': 'entity *' differs in levels of indirection from 'entity (*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(859,32): warning C4024: 'refreshEnemyMovement': different types for formal and actual parameter 1
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(903,39): warning C4047: 'function': 'entity *' differs in levels of indirection from 'entity (*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(903,39): warning C4024: 'hitboxDetection': different types for formal and actual parameter 2
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(903,55): warning C4047: 'function': 'int **' differs in levels of indirection from 'int (*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(903,55): warning C4024: 'hitboxDetection': different types for formal and actual parameter 4
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(904,38): warning C4047: 'function': 'entity *' differs in levels of indirection from 'entity (*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(904,38): warning C4024: 'hitboxDetection': different types for formal and actual parameter 2
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(904,54): warning C4047: 'function': 'int **' differs in levels of indirection from 'int (*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(904,54): warning C4024: 'hitboxDetection': different types for formal and actual parameter 4
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(905,29): warning C4047: 'function': 'entity *' differs in levels of indirection from 'entity (*)[2]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(905,29): warning C4024: 'colisionDetection': different types for formal and actual parameter 1
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(790,47): warning C4101: 'cosPE': unreferenced local variable
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(790,38): warning C4101: 'anglePE': unreferenced local variable
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(790,54): warning C4101: 'sinPE': unreferenced local variable
-  PI-Allegro.vcxproj -> C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(182,13): warning C4013:  'sodium_init' undefined; assuming extern returning int
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(249,42): warning C4013:  'randombytes_uniform' undefined; assuming extern returning int
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(800,36): warning C4047:  'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[2]'
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(800,36): warning C4024:  'initplayer': different types for formal and actual parameter 2
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(801,18): warning C4047:  'function': 'entity *' differs in levels of indirection from 'entity (*)[2]'
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(801,18): warning C4024:  'initenemy': different types for formal and actual parameter 1
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(801,32): warning C4047:  'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(801,32): warning C4024:  'initenemy': different types for formal and actual parameter 2
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(854,37): warning C4047:  'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[2]'
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(854,37): warning C4024:  'initplayer': different types for formal and actual parameter 2
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(855,19): warning C4047:  'function': 'entity *' differs in levels of indirection from 'entity (*)[2]'
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(855,19): warning C4024:  'initenemy': different types for formal and actual parameter 1
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(855,33): warning C4047:  'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(855,33): warning C4024:  'initenemy': different types for formal and actual parameter 2
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(862,42): warning C4047:  'function': 'tile *' differs in levels of indirection from 'tile (*)[2]'
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(862,42): warning C4024:  'refreshPlayerMovement': different types for formal and actual parameter 2
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(863,32): warning C4047:  'function': 'entity *' differs in levels of indirection from 'entity (*)[2]'
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(863,32): warning C4024:  'refreshEnemyMovement': different types for formal and actual parameter 1
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(907,39): warning C4047:  'function': 'entity *' differs in levels of indirection from 'entity (*)[2]'
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(907,39): warning C4024:  'hitboxDetection': different types for formal and actual parameter 2
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(907,55): warning C4047:  'function': 'int **' differs in levels of indirection from 'int (*)[2]'
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(907,55): warning C4024:  'hitboxDetection': different types for formal and actual parameter 4
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(908,38): warning C4047:  'function': 'entity *' differs in levels of indirection from 'entity (*)[2]'
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(908,38): warning C4024:  'hitboxDetection': different types for formal and actual parameter 2
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(908,54): warning C4047:  'function': 'int **' differs in levels of indirection from 'int (*)[2]'
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(908,54): warning C4024:  'hitboxDetection': different types for formal and actual parameter 4
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(909,29): warning C4047:  'function': 'entity *' differs in levels of indirection from 'entity (*)[2]'
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(909,29): warning C4024:  'colisionDetection': different types for formal and actual parameter 1
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(794,47): warning C4101:  'cosPE': unreferenced local variable
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(794,38): warning C4101:  'anglePE': unreferenced local variable
+C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(794,54): warning C4101:  'sinPE': unreferenced local variable
+  PI-Allegro.vcxproj -> C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe
