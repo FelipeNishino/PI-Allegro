@@ -164,6 +164,12 @@ ALLEGRO_DISPLAY* display = NULL;
 ALLEGRO_FONT* font = NULL;
 ALLEGRO_TIMER* timer = NULL;
 ALLEGRO_SAMPLE* sample = NULL;
+ALLEGRO_SAMPLE* shot = NULL;
+ALLEGRO_SAMPLE* sfx_jump = NULL;
+ALLEGRO_SAMPLE* sfx_sp1 = NULL;
+ALLEGRO_SAMPLE* sfx_sp2 = NULL;
+ALLEGRO_SAMPLE* sfx_sp3 = NULL;
+ALLEGRO_SAMPLE* sfx_hit = NULL;
 ALLEGRO_SAMPLE_INSTANCE* sampleInstance = NULL;
 ALLEGRO_EVENT_QUEUE* queue = NULL;
 ALLEGRO_BITMAP* playerShotTemplate;
@@ -203,7 +209,11 @@ int initialize() {
 	queue = al_create_event_queue();
 	font = al_load_font("Fonts/metal-slug.ttf", 13, 0);
 	al_set_window_title(display, "Metal Slug 5");
-	al_reserve_samples(1);
+	al_reserve_samples(4);
+	
+	sfx_sp1 = al_load_sample("Audio/spawn.wav");
+	shot = al_load_sample("Audio/tiro.ogg");
+	sfx_jump = al_load_sample("Audio/jump.wav");
 	sample = al_load_sample("Audio/bg_music.ogg");
 	playerShotTemplate = al_load_bitmap("Img/Tiro.bmp");
 	al_convert_mask_to_alpha(playerShotTemplate, al_map_rgb(255, 0, 255));
@@ -305,6 +315,8 @@ int initplayer(entity* c, ALLEGRO_BITMAP* player[]) {
 
 	player[shooting] = al_load_bitmap("Img/canvas.png");
 	al_convert_mask_to_alpha(player[shooting], al_map_rgb(0, 0, 0));
+
+	
 
 	c->x = 50 * tileSize;
 	c->y = 50 * tileSize;
@@ -724,10 +736,13 @@ void colisionDetection(entity* e, entity* p, int* iFC, int* fc) {
 			if (!p->immortality) {
 				if ((rightP > leftE && rightP < rightE) || (leftP > leftE && leftP < rightE)) {
 					if ((upP < downE && upP > upE) || (downP > upE && downP < downE)) {
+						
 						*iFC = *fc;
+						
 						for (i = 0; i > -8; i--) {
 							e->vel_y--;
 						}
+						
 						p->life -= projectileDamage;
 						p->immortality = true;
 					}
@@ -813,7 +828,9 @@ void createTileSet(int* mat) {
 }*/
 
 
+
 int main() {
+	sfx_hit = al_load_sample("Audio/hit.wav");
 	int i, j, projectileCount = 0, stageSelect = 0, enemyProjectileCount = 0, enemyDmgGauge = 0, hit = 0, hitI[2] = { 0, 0 }, hitII = 0, frameCount = 0, immortalityFC = 0, enemyDeadFC[enemyMax] = { 0, 0 };
 	int** tileset = NULL;
 	float cx = 0, cy = 0, w = 0, h = 0;
@@ -1034,7 +1051,9 @@ int main() {
 			if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
 				switch (event.keyboard.keycode) {
 				case ALLEGRO_KEY_UP:
+					
 					if (player.onGround) {
+						al_play_sample(sfx_jump, 0.25, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
 						player.vel_y = -8;
 						player.y--;
 						player.onGround = false;
@@ -1065,9 +1084,11 @@ int main() {
 					break;
 
 				case ALLEGRO_KEY_X:
+					al_play_sample(shot, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
 					if (projectileCount < projectileMax) {
 						for (i = 0; i < projectileMax; i++) {
 							if (!playerShot[i].projectileTravel) {
+								
 								projectileCount++;
 								player.spriteChange = 0;
 								pShoot(&playerShot[i], &player);

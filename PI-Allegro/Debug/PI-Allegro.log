@@ -1,8 +1,8 @@
 ﻿  PI-Allegro.c
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(189,13): warning C4013:  'sodium_init' undefined; assuming extern returning int
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(274,42): warning C4013:  'randombytes_uniform' undefined; assuming extern returning int
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(825,31): warning C4047:  'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(825,31): warning C4024:  'initenemy': different types for formal and actual parameter 2
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(909,32): warning C4047:  'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
-C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(909,32): warning C4024:  'initenemy': different types for formal and actual parameter 2
-  PI-Allegro.vcxproj -> C:\Users\HGM\Documents\GitHub\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe
+C:\Users\Paula Schmitz\Desktop\PI-Allegro\PI-Allegro\PI-Allegro.c(195,13): warning C4013: 'sodium_init' undefined; assuming extern returning int
+C:\Users\Paula Schmitz\Desktop\PI-Allegro\PI-Allegro\PI-Allegro.c(284,42): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
+C:\Users\Paula Schmitz\Desktop\PI-Allegro\PI-Allegro\PI-Allegro.c(842,31): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
+C:\Users\Paula Schmitz\Desktop\PI-Allegro\PI-Allegro\PI-Allegro.c(842,31): warning C4024: 'initenemy': different types for formal and actual parameter 2
+C:\Users\Paula Schmitz\Desktop\PI-Allegro\PI-Allegro\PI-Allegro.c(926,32): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
+C:\Users\Paula Schmitz\Desktop\PI-Allegro\PI-Allegro\PI-Allegro.c(926,32): warning C4024: 'initenemy': different types for formal and actual parameter 2
+  PI-Allegro.vcxproj -> C:\Users\Paula Schmitz\Desktop\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe
