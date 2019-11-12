@@ -1,8 +1,9 @@
 ﻿  PI-Allegro.c
-C:\Users\Paula Schmitz\Desktop\PI-Allegro\PI-Allegro\PI-Allegro.c(195,13): warning C4013: 'sodium_init' undefined; assuming extern returning int
-C:\Users\Paula Schmitz\Desktop\PI-Allegro\PI-Allegro\PI-Allegro.c(284,42): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
-C:\Users\Paula Schmitz\Desktop\PI-Allegro\PI-Allegro\PI-Allegro.c(842,31): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
-C:\Users\Paula Schmitz\Desktop\PI-Allegro\PI-Allegro\PI-Allegro.c(842,31): warning C4024: 'initenemy': different types for formal and actual parameter 2
-C:\Users\Paula Schmitz\Desktop\PI-Allegro\PI-Allegro\PI-Allegro.c(926,32): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
-C:\Users\Paula Schmitz\Desktop\PI-Allegro\PI-Allegro\PI-Allegro.c(926,32): warning C4024: 'initenemy': different types for formal and actual parameter 2
-  PI-Allegro.vcxproj -> C:\Users\Paula Schmitz\Desktop\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(197,13): warning C4013: 'sodium_init' indefinido; assumindo extern retornando int
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(286,42): warning C4013: 'randombytes_uniform' indefinido; assumindo extern retornando int
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(412,6): warning C4101: 'i': variável local não referenciada
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(881,31): warning C4047: 'função': 'ALLEGRO_BITMAP **' difere em níveis de indireção de 'ALLEGRO_BITMAP *(*)[3]'
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(881,31): warning C4024: 'initenemy': tipos diferentes para parâmetro formal e real 2
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(965,32): warning C4047: 'função': 'ALLEGRO_BITMAP **' difere em níveis de indireção de 'ALLEGRO_BITMAP *(*)[3]'
+C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\PI-Allegro.c(965,32): warning C4024: 'initenemy': tipos diferentes para parâmetro formal e real 2
+  PI-Allegro.vcxproj -> C:\Users\guigp\OneDrive\Documentos\GitHub\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe

@@ -32,6 +32,7 @@
 #define mapSize 100
 #define PI 3.14159265
 #define SODIUM_STATIC
+#define helksonChupaRola 24
 
 enum {
 	antiVirus,
@@ -183,6 +184,7 @@ ALLEGRO_FILE* txtmap;
 ALLEGRO_TRANSFORM camera;
 entity player;
 projectile playerShot[projectileMax];
+projectile playerTripleShot[projectileMax];
 entity enemy[enemyMax];
 projectile enemyShot[enemyProjectileMax];
 entity enemyShooter;
@@ -404,6 +406,43 @@ void pShoot(projectile* p, entity* c) {
 
 	c->isShooting = true;
 	p->projectileTravel = true;
+}
+
+void tripleShot(projectile* p, entity* c) {
+	int i;
+	
+	c->sprite = shooting;
+
+	p->speed = 0.6;
+	p->accel = 0.1;
+
+	p->width = 46;
+	p->height = 22;
+
+	p->hbWidth = 46;
+	p->hbHeight = 22;
+
+	p->origin = friendly;
+
+	p->dir = c->currentDir;
+
+	if (p->dir == Right) {
+		p->x0 = c->x + c->hbWidth;
+		p->y0 = c->y + projectileOffset;
+	}
+	else {
+		p->x0 = c->x - p->hbWidth;
+		p->y0 = c->y + projectileOffset;
+	}
+
+	p->damage = 2;
+	p->type = c->selectedWeapon;
+
+	p->x = p->x0;
+	p->y = p->y0;
+
+	p->projectileTravel = true;
+	c->isShooting = true;
 }
 
 void eShoot(projectile* p, entity* e, entity* c, int fc) {
@@ -933,6 +972,7 @@ int main() {
 				refreshPlayerMovement(&player, tiles, tileset);
 				refreshEnemyMovement(enemy, &player);
 				refreshProjectileState(playerShot, enemyShot, player, &projectileCount, &enemyProjectileCount, cx, cy);
+				refreshProjectileState(playerTripleShot, enemyShot, player, &projectileCount, &enemyProjectileCount, cx, cy);
 
 				refreshCamera(&cx, &cy, player);
 
@@ -976,6 +1016,7 @@ int main() {
 
 				hitboxDetection(playerShot, enemy, &player, &killCount, hitI, &projectileCount, &immortalityFC, enemyDeadFC, &frameCount);
 				hitboxDetection(enemyShot, enemy, &player, &killCount, hitI, &projectileCount, &immortalityFC, enemyDeadFC, &frameCount);
+				hitboxDetection(playerTripleShot, enemy, &player, &killCount, hitI, &projectileCount, &immortalityFC, enemyDeadFC, &frameCount);
 				colisionDetection(enemy, &player, &immortalityFC, &frameCount);
 
 				/*while (hit > 0) {
@@ -1097,6 +1138,23 @@ int main() {
 						}
 					}
 					break;
+				
+
+				case ALLEGRO_KEY_C:
+					al_play_sample(shot, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+					if (projectileCount < projectileMax) {
+						for (i = 0; i < projectileMax; i++) {
+							if (!playerShot[i].projectileTravel) {
+
+								projectileCount++;
+								player.spriteChange = 0;
+								tripleShot(&playerTripleShot[i], &player);
+								
+								break;
+							}
+						}
+					}
+					break;
 				}
 			}
 
@@ -1189,6 +1247,22 @@ int main() {
 						}
 						else {
 							al_draw_tinted_bitmap(playerShotTemplate, al_map_rgb(playerShot[i].r, playerShot[i].g, playerShot[i].b), playerShot[i].x, playerShot[i].y, 0);
+						}
+					}
+				}
+
+				for (i = 0; i < projectileMax; i++) {
+					if (playerTripleShot[i].projectileTravel) {
+						setProjectileColor(&playerTripleShot[i]);
+						if (playerTripleShot[i].dir == Right) {
+							al_draw_tinted_bitmap(playerShotTemplate, al_map_rgb(playerTripleShot[i].r, playerTripleShot[i].g, playerTripleShot[i].b), playerTripleShot[i].x, playerTripleShot[i].y, ALLEGRO_FLIP_HORIZONTAL);
+							al_draw_tinted_bitmap(playerShotTemplate, al_map_rgb(playerTripleShot[i].r, playerTripleShot[i].g, playerTripleShot[i].b), playerTripleShot[i].x, playerTripleShot[i].y + 50, ALLEGRO_FLIP_HORIZONTAL);
+							al_draw_tinted_bitmap(playerShotTemplate, al_map_rgb(playerTripleShot[i].r, playerTripleShot[i].g, playerTripleShot[i].b), playerTripleShot[i].x, playerTripleShot[i].y - 50, ALLEGRO_FLIP_HORIZONTAL);
+						}
+						else {
+							al_draw_tinted_bitmap(playerShotTemplate, al_map_rgb(playerTripleShot[i].r, playerTripleShot[i].g, playerTripleShot[i].b), playerTripleShot[i].x, playerTripleShot[i].y, 0);
+							al_draw_tinted_bitmap(playerShotTemplate, al_map_rgb(playerTripleShot[i].r, playerTripleShot[i].g, playerTripleShot[i].b), playerTripleShot[i].x, playerTripleShot[i].y + 50, 0);
+							al_draw_tinted_bitmap(playerShotTemplate, al_map_rgb(playerTripleShot[i].r, playerTripleShot[i].g, playerTripleShot[i].b), playerTripleShot[i].x, playerTripleShot[i].y - 50, 0);
 						}
 					}
 				}
