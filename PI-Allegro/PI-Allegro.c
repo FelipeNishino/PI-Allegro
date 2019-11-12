@@ -17,6 +17,7 @@
 #define worldHeight 1000
 
 // Felipe
+#define queueSize 5
 #define projectileVelocity 0.6
 #define projectileAccel 0.25
 #define projectileOffset 10
@@ -69,6 +70,12 @@ enum {
 #define Left 0
 #define Right 1
 #define gravity 0.275
+
+typedef struct TQueue {
+	int tamanho, inicio, fim, total;
+	char fila[queueSize];
+} queue;
+
 
 typedef struct entity {
 	float x, y;
@@ -171,7 +178,7 @@ ALLEGRO_SAMPLE* sfx_sp2 = NULL;
 ALLEGRO_SAMPLE* sfx_sp3 = NULL;
 ALLEGRO_SAMPLE* sfx_hit = NULL;
 ALLEGRO_SAMPLE_INSTANCE* sampleInstance = NULL;
-ALLEGRO_EVENT_QUEUE* queue = NULL;
+ALLEGRO_EVENT_QUEUE* evQueue = NULL;
 ALLEGRO_BITMAP* playerShotTemplate;
 ALLEGRO_BITMAP* enemyShotTemplate;
 ALLEGRO_BITMAP* stage[3];
@@ -206,7 +213,7 @@ int initialize() {
 	timer = al_create_timer(1.0 / FPS);
 	al_set_new_display_flags(ALLEGRO_RESIZABLE);
 	display = al_create_display(windowWidth, windowHeight);
-	queue = al_create_event_queue();
+	evQueue = al_create_event_queue();
 	font = al_load_font("Fonts/metal-slug.ttf", 13, 0);
 	al_set_window_title(display, "Metal Slug 5");
 	al_reserve_samples(4);
@@ -221,15 +228,85 @@ int initialize() {
 	al_install_keyboard();
 	al_install_mouse();
 
-	al_register_event_source(queue, al_get_display_event_source(display));
-	al_register_event_source(queue, al_get_timer_event_source(timer));
+	al_register_event_source(evQueue, al_get_display_event_source(display));
+	al_register_event_source(evQueue, al_get_timer_event_source(timer));
 
-	al_register_event_source(queue, al_get_mouse_event_source());
-	al_register_event_source(queue, al_get_keyboard_event_source());
+	al_register_event_source(evQueue, al_get_mouse_event_source());
+	al_register_event_source(evQueue, al_get_keyboard_event_source());
 
 	al_start_timer(timer);
 
 	return 0;
+}
+
+void initQueue(queue* f) {
+	int i;
+	f->inicio = 0;
+	f->fim = 0;
+	f->total = 0;
+	f->tamanho = queueSize;
+	for (i = 0; i < queueSize; i++) {
+		f->fila[i] = "";
+	}
+}
+
+bool isQueueEmpty(queue* f) {
+	if (f->total == 0) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+bool isQueueFull(queue* f) {
+	if (f->total >= f->tamanho) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+void enqueue(queue* f, char val[]) {
+	if (!isQueueFull(f)) {
+		f->fila[f->fim] = val[0];
+		f->fim = f->fim + 1;
+		f->total = f->total + 1;
+		if (f->fim >= f->tamanho) {
+			f->fim = 0;
+		}
+	}
+}
+
+char dequeue(queue* f) {
+	char x = -1;
+
+	if (!isQueueEmpty(f)) {
+		x = f->fila[f->inicio];
+		f->inicio = f->inicio + 1;
+		f->total = f->total - 1;
+		if (f->inicio >= f->tamanho) {
+			f->inicio = 0;
+		}
+	}
+	return x;
+}
+
+char firstIn(queue* f) {
+	return f->fila[f->inicio];
+}
+
+void viewQueue(queue* f) {
+	int i, j = 0;
+
+	for (i = f->inicio; j < f->total; i++) {
+		if (i >= f->tamanho) {
+			i = 0;
+		}
+		printf("Elemento %c posicao %d\n", f->fila[i], i);
+		j++;
+	}
 }
 
 float absF(float* x) {
@@ -831,15 +908,21 @@ void createTileSet(int* mat) {
 
 int main() {
 	sfx_hit = al_load_sample("Audio/hit.wav");
-	int i, j, projectileCount = 0, stageSelect = 0, enemyProjectileCount = 0, enemyDmgGauge = 0, hit = 0, hitI[2] = { 0, 0 }, hitII = 0, frameCount = 0, immortalityFC = 0, enemyDeadFC[enemyMax] = { 0, 0 };
+	int i, j, projectileCount = 0, stageSelect = 1, enemyProjectileCount = 0, enemyDmgGauge = 0, hit = 0, hitI[2] = { 0, 0 }, hitII = 0, frameCount = 0, immortalityFC = 0, enemyDeadFC[enemyMax] = { 0, 0 };
 	int** tileset = NULL;
 	float cx = 0, cy = 0, w = 0, h = 0;
-	char enemyLifeGauge[5], ptx[8], pty[8], objText[25];
-	bool gameLoop = false, menuLoop = true, toggleStartText = false, exit = false;
+	char debugInput[2] = "", debugTest[6] = "debug", enemyLifeGauge[5], ptx[8], pty[8], objText[25];
+	bool gameLoop = false, menuLoop = true, toggleStartText = false, exit = false, devMode = false, modDown = false, levelEditor = false;
+	queue devChecker;
 
 	initialize();
-	initplayer(&player, playerSprites);
-	initenemy(enemy, &enemySprite);
+	initQueue(&devChecker);
+	//devChecker->inicio = 0;
+	//devChecker->fim = 0;
+	//devChecker->total = 0;
+	//devChecker->tamanho = queueSize;
+	//initplayer(&player, playerSprites);
+	//initenemy(enemy, &enemySprite);
 	//createTileAtlas();
 
 	tiles[ground].isSolid = true;
@@ -858,21 +941,92 @@ int main() {
 	while (!exit) {
 		while (menuLoop) {
 			ALLEGRO_EVENT event;
-			al_wait_for_event(queue, &event);
+			al_wait_for_event(evQueue, &event);
 
-			if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
-				if (event.keyboard.keycode == ALLEGRO_KEY_1) {
-					stageSelect = 1;
-					killCount.count = 5;
-					killCount.type = shooter;
-					menuLoop = false;
-					gameLoop = true;
+			
+
+			if (event.type == ALLEGRO_EVENT_KEY_CHAR) {
+				debugInput[0] = event.keyboard.unichar;
+
+				if (isQueueFull(&devChecker)) {
+					dequeue(&devChecker);
+					enqueue(&devChecker, debugInput);
 				}
-				if (event.keyboard.keycode == ALLEGRO_KEY_2) {
-					stageSelect = 2;
-					endurance.count = 600;
-					menuLoop = false;
-					gameLoop = true;
+				else {
+					enqueue(&devChecker, debugInput);
+				}
+				j = 0;
+
+				for (i = devChecker.inicio; j < devChecker.total; i++) {
+					if (i >= devChecker.tamanho) {
+						i = 0;
+					}
+					if (devChecker.fila[i] != debugTest[j])	{
+						break;
+					}
+					if (j == 4) {
+						devMode = true;
+					}
+					j++;
+				}
+			}
+			if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+				switch (event.keyboard.keycode) {
+				case ALLEGRO_KEY_LSHIFT:
+				case ALLEGRO_KEY_RSHIFT:
+					modDown = true;
+					break;
+				case ALLEGRO_KEY_ENTER:
+					switch (stageSelect) {
+					case 1:
+						killCount.count = 5;
+						killCount.type = shooter;
+						menuLoop = false;
+						if (modDown && devMode) {
+							player.x = 50 * tileSize;
+							player.y = 50 * tileSize;
+							levelEditor = true;
+							gameLoop = false;
+						}
+						else {
+							gameLoop = true;
+							levelEditor = false;
+						}
+						break;
+					case 2:
+						endurance.count = 600;
+						menuLoop = false;
+						if (modDown && devMode) {
+							player.x = 50 * tileSize;
+							player.y = 50 * tileSize;
+							levelEditor = true;
+							gameLoop = false;
+						}
+						else {
+							gameLoop = true;
+							levelEditor = false;
+						}
+						break;
+					}
+					break;
+				case ALLEGRO_KEY_UP:
+					stageSelect--;
+					if (stageSelect < 1) {
+						stageSelect = 2;
+					}
+					break;
+				case ALLEGRO_KEY_DOWN:
+					stageSelect++;
+					if (stageSelect > 2) {
+						stageSelect = 1;
+					}
+					break;
+				}
+			}
+
+			if (event.type == ALLEGRO_EVENT_KEY_UP) {
+				if (event.keyboard.keycode == ALLEGRO_KEY_LSHIFT || event.keyboard.keycode == ALLEGRO_KEY_RSHIFT) {
+					modDown = false;
 				}
 			}
 
@@ -881,15 +1035,26 @@ int main() {
 			}
 			exitGame(event, &menuLoop, &exit);
 
-			if (al_is_event_queue_empty(queue)) {
+			if (al_is_event_queue_empty(evQueue)) {
 				al_clear_to_color(al_map_rgb(0, 0, 0));
 				if (frameCount % (FPS / 2) == 0) {
 					toggleStartText = !toggleStartText;
 				}
+				if (devMode) {
+					al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, 0, ALLEGRO_ALIGN_CENTER, "Dev mode!!");
+				}
 				if (toggleStartText) {
 					al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, windowHeight / 2 - 12, ALLEGRO_ALIGN_CENTER, "Select mission!!");
-					al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, windowHeight / 2, ALLEGRO_ALIGN_CENTER, "1 - kill shooters");
-					al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, windowHeight / 2 + 12, ALLEGRO_ALIGN_CENTER, "2 - endurance");
+				}
+				al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, windowHeight / 2, ALLEGRO_ALIGN_CENTER, "1 - kill shooters");
+				al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, windowHeight / 2 + 12, ALLEGRO_ALIGN_CENTER, "2 - endurance");
+				switch (stageSelect) {
+				case 1:
+					al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2 - (10 * 12), windowHeight / 2, ALLEGRO_ALIGN_CENTER, "->");
+					break;
+				case 2:
+					al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2 - (9 * 12), windowHeight / 2 + 12, ALLEGRO_ALIGN_CENTER, "->");
+					break;
 				}
 				al_flip_display();
 			}
@@ -922,12 +1087,183 @@ int main() {
 		}
 
 		al_play_sample(sample, 0.025, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
+
+		while (levelEditor) {
+			ALLEGRO_EVENT event;
+			al_wait_for_event(evQueue, &event);
+
+			if (event.type == ALLEGRO_EVENT_MOUSE_AXES) {
+				player.tileX = event.mouse.x / tileSize;
+				player.tileY = event.mouse.y / tileSize;
+			}
+
+			if (event.type == ALLEGRO_EVENT_TIMER) {
+				if (player.x <= 0 + (al_get_display_width(display) / 2) || player.x >= (mapSize * tileSize) - (al_get_display_width(display) / 2)) {
+					player.vel_x = 0;
+				}
+
+				if (player.y <= 0 + (al_get_display_height(display) / 2) || player.y >= (mapSize * tileSize) - (al_get_display_height(display) / 2)) {
+					player.vel_y = 0;
+				}
+
+				player.x += player.vel_x;
+				player.y += player.vel_y;
+
+				refreshCamera(&cx, &cy, player);
+
+				frameCount++;
+			}
+
+			exitGame(event, &menuLoop, &exit);
+
+			if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+				switch (event.keyboard.keycode) {
+				case ALLEGRO_KEY_UP:
+				case ALLEGRO_KEY_W:
+					player.vel_y += -8;
+					break;
+
+				case ALLEGRO_KEY_LEFT:
+				case ALLEGRO_KEY_A:
+					player.vel_x += -8;
+					break;
+
+				case ALLEGRO_KEY_DOWN:
+				case ALLEGRO_KEY_S:
+					player.vel_y += 8;
+					break;
+
+				case ALLEGRO_KEY_RIGHT:
+				case ALLEGRO_KEY_D:
+					player.vel_x += 8;
+					break;
+
+				case ALLEGRO_KEY_Q:
+					player.selectedWeapon--;
+					if (player.selectedWeapon < 0) {
+						player.selectedWeapon = 1;
+					}
+					break;
+
+				case ALLEGRO_KEY_E:
+					player.selectedWeapon++;
+					if (player.selectedWeapon > 1) {
+						player.selectedWeapon = 0;
+					}
+					break;
+
+				case ALLEGRO_KEY_X:
+					al_play_sample(shot, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+					if (projectileCount < projectileMax) {
+						for (i = 0; i < projectileMax; i++) {
+							if (!playerShot[i].projectileTravel) {
+
+								projectileCount++;
+								player.spriteChange = 0;
+								pShoot(&playerShot[i], &player);
+								break;
+							}
+						}
+					}
+					break;
+				}
+			}
+
+			if (event.type == ALLEGRO_EVENT_KEY_UP) {
+				switch (event.keyboard.keycode) {
+				case ALLEGRO_KEY_UP:
+				case ALLEGRO_KEY_W:
+				case ALLEGRO_KEY_DOWN:
+				case ALLEGRO_KEY_S:
+					player.vel_y = 0;
+					break;
+
+				case ALLEGRO_KEY_LEFT:
+				case ALLEGRO_KEY_A:
+				case ALLEGRO_KEY_RIGHT:
+				case ALLEGRO_KEY_D:
+					player.vel_x = 0;
+					break;
+				}
+			}
+
+			exitGame(event, &gameLoop, &exit);
+
+			if (event.type == ALLEGRO_EVENT_DISPLAY_RESIZE) {
+				al_acknowledge_resize(display);
+			}
+
+			if (al_is_event_queue_empty(evQueue)) {
+				al_clear_to_color(al_map_rgb(255, 255, 255));
+
+				al_identity_transform(&camera);
+				al_translate_transform(&camera, -cx * 0.05, -cy * 0.05);
+				al_use_transform(&camera);
+
+				al_draw_bitmap(stage[backgroundL1], 0, 0, 0);
+				al_draw_bitmap(stage[backgroundL1], al_get_bitmap_width(stage[backgroundL1]), 0, ALLEGRO_FLIP_HORIZONTAL);
+
+				al_identity_transform(&camera);
+				al_translate_transform(&camera, -cx, -cy);
+				al_use_transform(&camera);
+
+				for (i = 0; i < mapSize; i++) {
+					for (j = 0; j < mapSize; j++) {
+						switch (tileset[i][j]) {
+						case ground:
+							al_draw_filled_rectangle(j * tileSize, i * tileSize, j * tileSize + tileSize, i * tileSize + tileSize, al_map_rgb(255, 0, 0));
+							break;
+						case air:
+							//al_draw_rectangle(j* tileSize, i* tileSize, j* tileSize + tileSize, i* tileSize + tileSize, al_map_rgb(255, 0, 0), 2);
+							break;
+						case roof:
+							break;
+						}
+					}
+				}
+
+				al_identity_transform(&camera);
+				al_use_transform(&camera);
+
+				switch (stageSelect) {
+				case 1:
+					sprintf_s(objText, sizeof(objText), "Stage %d", stageSelect);
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 5, 0, objText);
+					break;
+				case 2:
+					sprintf_s(objText, sizeof(objText), "Stage %d", stageSelect);
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 5, 0, objText);
+					break;
+				}
+
+				switch (player.selectedWeapon) {
+				case 0:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = air");
+					break;
+				case 1:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = ground");
+					break;
+				}
+
+				if (devMode) {
+					al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, 0, ALLEGRO_ALIGN_CENTER, "Dev mode!!");
+				}
+
+				sprintf_s(ptx, sizeof(ptx), "X = %d", player.tileX);
+				al_draw_text(font, al_map_rgb(255, 255, 255), 10, 50, 0, ptx);
+				sprintf_s(pty, sizeof(pty), "Y = %d", player.tileY);
+				al_draw_text(font, al_map_rgb(255, 255, 255), 100, 50, 0, pty);
+
+				al_flip_display();
+			}
+		}
+
 		initplayer(&player, playerSprites);
 		initenemy(enemy, &enemySprite);
 
 		while (gameLoop) {
 			ALLEGRO_EVENT event;
-			al_wait_for_event(queue, &event);
+			al_wait_for_event(evQueue, &event);
 
 			if (event.type == ALLEGRO_EVENT_TIMER) {
 				refreshPlayerMovement(&player, tiles, tileset);
@@ -1121,7 +1457,7 @@ int main() {
 				al_acknowledge_resize(display);
 			}
 
-			if (al_is_event_queue_empty(queue)) {
+			if (al_is_event_queue_empty(evQueue)) {
 				al_clear_to_color(al_map_rgb(255, 255, 255));
 
 				al_identity_transform(&camera);
@@ -1237,6 +1573,9 @@ int main() {
 					break;
 				}
 
+				if (devMode) {
+					al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, 0, ALLEGRO_ALIGN_CENTER, "Dev mode!!");
+				}
 
 				sprintf_s(ptx, sizeof(ptx), "X = %d", player.tileX);
 				al_draw_text(font, al_map_rgb(255, 255, 255), 10, 50, 0, ptx);
