@@ -970,7 +970,7 @@ int main() {
 	tiles[air].isSolid = false;
 	tiles[air].id = air;
 
-	stage[backgroundL1] = al_load_bitmap("Img/bg.jpg");
+	stage[backgroundL1] = al_load_bitmap("Img/foreground.png");
 	stage[backgroundL2] = al_load_bitmap("Img/backgroundLayer2.bmp");
 	stage[foreground] = al_load_bitmap("Img/foreground.bmp");
 	al_convert_mask_to_alpha(stage[foreground], al_map_rgb(255, 0, 255));
