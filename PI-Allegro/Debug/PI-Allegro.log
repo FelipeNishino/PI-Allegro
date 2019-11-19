@@ -1,15 +1,15 @@
 ﻿  PI-Allegro.c
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(186,13): warning C4013: 'sodium_init' undefined; assuming extern returning int
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(235,18): warning C4047: '=': 'char' differs in levels of indirection from 'char [1]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(335,42): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(416,6): warning C4101: 'i': unreferenced local variable
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1585,42): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1585,42): warning C4024: 'initenemya': different types for formal and actual parameter 2
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1623,42): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1623,42): warning C4024: 'initenemya': different types for formal and actual parameter 2
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1710,42): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1710,42): warning C4024: 'initenemya': different types for formal and actual parameter 2
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1718,42): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1718,42): warning C4024: 'initenemya': different types for formal and actual parameter 2
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1239,10): warning C4101: 'edit': unreferenced local variable
-  PI-Allegro.vcxproj -> C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe
+C:\Users\felipe.dnishino\Documents\Aulas\2º Semestre\PI\PI-Allegro\PI-Allegro\PI-Allegro.c(192,13): warning C4013: 'sodium_init' indefinido; assumindo extern retornando int
+C:\Users\felipe.dnishino\Documents\Aulas\2º Semestre\PI\PI-Allegro\PI-Allegro\PI-Allegro.c(241,18): warning C4047: '=': 'char' difere em níveis de indireção de 'char [1]'
+C:\Users\felipe.dnishino\Documents\Aulas\2º Semestre\PI\PI-Allegro\PI-Allegro\PI-Allegro.c(341,42): warning C4013: 'randombytes_uniform' indefinido; assumindo extern retornando int
+C:\Users\felipe.dnishino\Documents\Aulas\2º Semestre\PI\PI-Allegro\PI-Allegro\PI-Allegro.c(422,6): warning C4101: 'i': variável local não referenciada
+C:\Users\felipe.dnishino\Documents\Aulas\2º Semestre\PI\PI-Allegro\PI-Allegro\PI-Allegro.c(1638,42): warning C4047: 'função': 'ALLEGRO_BITMAP **' difere em níveis de indireção de 'ALLEGRO_BITMAP *(*)[3]'
+C:\Users\felipe.dnishino\Documents\Aulas\2º Semestre\PI\PI-Allegro\PI-Allegro\PI-Allegro.c(1638,42): warning C4024: 'initenemya': tipos diferentes para parâmetro formal e real 2
+C:\Users\felipe.dnishino\Documents\Aulas\2º Semestre\PI\PI-Allegro\PI-Allegro\PI-Allegro.c(1677,42): warning C4047: 'função': 'ALLEGRO_BITMAP **' difere em níveis de indireção de 'ALLEGRO_BITMAP *(*)[3]'
+C:\Users\felipe.dnishino\Documents\Aulas\2º Semestre\PI\PI-Allegro\PI-Allegro\PI-Allegro.c(1677,42): warning C4024: 'initenemya': tipos diferentes para parâmetro formal e real 2
+C:\Users\felipe.dnishino\Documents\Aulas\2º Semestre\PI\PI-Allegro\PI-Allegro\PI-Allegro.c(1765,42): warning C4047: 'função': 'ALLEGRO_BITMAP **' difere em níveis de indireção de 'ALLEGRO_BITMAP *(*)[3]'
+C:\Users\felipe.dnishino\Documents\Aulas\2º Semestre\PI\PI-Allegro\PI-Allegro\PI-Allegro.c(1765,42): warning C4024: 'initenemya': tipos diferentes para parâmetro formal e real 2
+C:\Users\felipe.dnishino\Documents\Aulas\2º Semestre\PI\PI-Allegro\PI-Allegro\PI-Allegro.c(1773,42): warning C4047: 'função': 'ALLEGRO_BITMAP **' difere em níveis de indireção de 'ALLEGRO_BITMAP *(*)[3]'
+C:\Users\felipe.dnishino\Documents\Aulas\2º Semestre\PI\PI-Allegro\PI-Allegro\PI-Allegro.c(1773,42): warning C4024: 'initenemya': tipos diferentes para parâmetro formal e real 2
+C:\Users\felipe.dnishino\Documents\Aulas\2º Semestre\PI\PI-Allegro\PI-Allegro\PI-Allegro.c(1260,10): warning C4101: 'edit': variável local não referenciada
+  PI-Allegro.vcxproj -> C:\Users\felipe.dnishino\Documents\Aulas\2º Semestre\PI\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe

@@ -52,7 +52,8 @@ enum {
 	air,
 	chaoesq,
 	chaomeio,
-	chaodir
+	chaodir,
+	chao
 };
 enum {
 	projectileI,
@@ -144,6 +145,11 @@ typedef struct objective {
 	int type;
 	//int stage;
 } objective;
+
+struct progresso {
+	bool m1;
+	bool m2;
+} adv;
 
 ALLEGRO_DISPLAY* display = NULL;
 ALLEGRO_FONT* font = NULL;
@@ -1017,10 +1023,13 @@ int main() {
 	tiles[chaodir].isSolid = true;
 	tiles[chaodir].id = chaodir;
 
-	stage[backgroundL1] = al_load_bitmap("Img/H/backgroundL1.png");
-	stage[backgroundL2] = al_load_bitmap("Img/H/backgroundL2.png");
+	tiles[chao].isSolid = true;
+	tiles[chao].id = chao;
+
+	stage[backgroundL1] = al_load_bitmap("Img/backgroundL1.png");
+	stage[backgroundL2] = al_load_bitmap("Img/backgroundL2.png");
 	al_convert_mask_to_alpha(stage[backgroundL2], al_map_rgb(255, 0, 255));
-	stage[backgroundL3] = al_load_bitmap("Img/H/backgroundL3.png");
+	stage[backgroundL3] = al_load_bitmap("Img/backgroundL3.png");
 	al_convert_mask_to_alpha(stage[backgroundL3], al_map_rgb(255, 0, 255));
 
 	tileAtlas = al_load_bitmap("Img/tilesheet.png");
@@ -1179,8 +1188,20 @@ int main() {
 				if (toggleStartText) {
 					al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, windowHeight / 2 - 12, ALLEGRO_ALIGN_CENTER, "Select mission!!");
 				}
-				al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, windowHeight / 2, ALLEGRO_ALIGN_CENTER, "1 - kill shooters");
-				al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, windowHeight / 2 + 1 * 12, ALLEGRO_ALIGN_CENTER, "2 - endurance");
+				if (adv.m1) {
+					al_draw_text(font, al_map_rgb(0, 255, 0), windowWidth / 2, windowHeight / 2, ALLEGRO_ALIGN_CENTER, "1 - kill shooters");
+				}
+				else {
+					al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, windowHeight / 2, ALLEGRO_ALIGN_CENTER, "1 - kill shooters");
+				}
+
+				if (adv.m2) {
+					al_draw_text(font, al_map_rgb(0, 255, 0), windowWidth / 2, windowHeight / 2 + 1 * 12, ALLEGRO_ALIGN_CENTER, "2 - endurance");
+				}
+				else {
+					al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, windowHeight / 2 + 1 * 12, ALLEGRO_ALIGN_CENTER, "2 - endurance");
+				}
+
 				/*al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, windowHeight / 2 + 2 * 12, ALLEGRO_ALIGN_CENTER, "3 - test");
 				al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, windowHeight / 2 + 3 * 12, ALLEGRO_ALIGN_CENTER, "4 - test");*/
 				al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2 - (10 * 12), windowHeight / 2 + (stageSelect - 1) * 12, ALLEGRO_ALIGN_CENTER, "->");
@@ -1255,7 +1276,7 @@ int main() {
 			}
 
 			if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-				if (event.mouse.button == 1 && !modDown) {
+				if (event.mouse.button == 1) {
 					if (!modDown) {
 						tileset[player.tileY][player.tileX] = player.selectedWeapon;
 						editorClick.x = player.tileX;
@@ -1348,13 +1369,13 @@ int main() {
 				case ALLEGRO_KEY_Q:
 					player.selectedWeapon--;
 					if (player.selectedWeapon < 0) {
-						player.selectedWeapon = 3;
+						player.selectedWeapon = 4;
 					}
 					break;
 
 				case ALLEGRO_KEY_E:
 					player.selectedWeapon++;
-					if (player.selectedWeapon > 3) {
+					if (player.selectedWeapon > 4) {
 						player.selectedWeapon = 0;
 					}
 					break;
@@ -1422,12 +1443,38 @@ int main() {
 			if (al_is_event_queue_empty(evQueue)) {
 				al_clear_to_color(al_map_rgb(255, 255, 255));
 
-				al_identity_transform(&camera);
+				/*al_identity_transform(&camera);
 				al_translate_transform(&camera, -cx * 0.05, -cy * 0.05);
 				al_use_transform(&camera);
 
 				al_draw_bitmap(stage[backgroundL1], 0, 0, 0);
 				al_draw_bitmap(stage[backgroundL1], al_get_bitmap_width(stage[backgroundL1]), 0, ALLEGRO_FLIP_HORIZONTAL);
+
+				al_identity_transform(&camera);
+				al_translate_transform(&camera, -cx, -cy);
+				al_use_transform(&camera);*/
+
+				al_identity_transform(&camera);
+				al_translate_transform(&camera, -cx * 0.05, 0);//-cy * 0.1);
+				al_use_transform(&camera);
+
+				al_draw_bitmap(stage[backgroundL1], 0, 0, 0);
+				al_draw_bitmap(stage[backgroundL1], al_get_bitmap_width(stage[backgroundL1]), 0, ALLEGRO_FLIP_HORIZONTAL);
+
+				al_identity_transform(&camera);
+				al_translate_transform(&camera, -cx * 0.25, 0);//-cy * 0.1);
+				al_use_transform(&camera);
+
+				al_draw_bitmap(stage[backgroundL2], 0, 0, 0);
+				al_draw_bitmap(stage[backgroundL2], al_get_bitmap_width(stage[backgroundL2]), 0, 0);
+
+				al_identity_transform(&camera);
+				al_translate_transform(&camera, -cx * 0.85, 0);//-cy * 0.1);
+				al_use_transform(&camera);
+
+				al_draw_bitmap(stage[backgroundL3], 0, 0, 0);
+				al_draw_bitmap(stage[backgroundL3], al_get_bitmap_width(stage[backgroundL3]), 0, 0);
+				al_draw_bitmap(stage[backgroundL3], 2 * al_get_bitmap_width(stage[backgroundL3]), 0, 0);
 
 				al_identity_transform(&camera);
 				al_translate_transform(&camera, -cx, -cy);
@@ -1444,6 +1491,9 @@ int main() {
 							break;
 						case chaodir:
 							al_draw_bitmap_region(tileAtlas, 2 * tileSize, 0, tileSize, tileSize, j * tileSize, i * tileSize, 0);
+							break;
+						case chao:
+							al_draw_bitmap_region(tileAtlas, 3 * tileSize, 0, tileSize, tileSize, j * tileSize, i * tileSize, 0);
 							break;
 						case air:
 							//al_draw_rectangle(j* tileSize, i* tileSize, j* tileSize + tileSize, i* tileSize + tileSize, al_map_rgb(255, 0, 0), 2);
@@ -1478,6 +1528,9 @@ int main() {
 					break;
 				case 3:
 					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chaodir");
+					break;
+				case 4:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chao");
 					break;
 				}
 
@@ -1612,6 +1665,7 @@ int main() {
 						}
 					}
 					if (killCount.count == 0) {
+						adv.m1 = true;
 						menuLoop = true;
 						gameLoop = false;
 					}
@@ -1626,6 +1680,7 @@ int main() {
 						}
 					}
 					if (endurance.count == 0) {
+						adv.m2 = true;
 						menuLoop = true;
 						gameLoop = false;
 					}
@@ -1786,6 +1841,9 @@ int main() {
 							break;
 						case chaodir:
 							al_draw_bitmap_region(tileAtlas, 2 * tileSize, 0, tileSize, tileSize, j * tileSize, i * tileSize, 0);
+							break;
+						case chao:
+							al_draw_bitmap_region(tileAtlas, 3 * tileSize, 0, tileSize, tileSize, j * tileSize, i * tileSize, 0);
 							break;
 						case air:
 							//al_draw_rectangle(j* tileSize, i* tileSize, j* tileSize + tileSize, i* tileSize + tileSize, al_map_rgb(255, 0, 0), 2);
