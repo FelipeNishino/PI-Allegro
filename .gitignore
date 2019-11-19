@@ -1,0 +1,11 @@
+
+*.log
+*.tlog
+PI-Allegro/.vs/PI-Allegro/v16/.suo
+PI-Allegro/.vs/PI-Allegro/v16/Browse.VC.db
+PI-Allegro/Debug/PI-Allegro.exe
+PI-Allegro/Debug/PI-Allegro.ilk
+PI-Allegro/Debug/PI-Allegro.obj
+PI-Allegro/Debug/PI-Allegro.pdb
+PI-Allegro/Debug/vc142.pdb
+PI-Allegro/Debug/vc142.idb
