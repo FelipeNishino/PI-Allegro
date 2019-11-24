@@ -32,6 +32,9 @@
 #define tileSize 32
 #define mapSize 100
 #define PI 3.14159265
+#define Left 0
+#define Right 1
+#define gravity 0.275
 #define SODIUM_STATIC
 
 enum {
@@ -73,11 +76,6 @@ enum {
 	fixed
 };
 
-// Helkson
-#define Left 0
-#define Right 1
-#define gravity 0.275
-
 typedef struct TQueue {
 	int tamanho, inicio, fim, total;
 	char fila[queueSize];
@@ -96,7 +94,6 @@ typedef struct entity {
 	float life, maxLife;
 	int hbWidth, hbHeight;
 	float hbX, hbY;
-	int sprite;
 	int spriteChange;
 	int shotFC;
 	int r;
@@ -166,8 +163,8 @@ ALLEGRO_EVENT_QUEUE* evQueue = NULL;
 ALLEGRO_BITMAP* playerShotTemplate[2];
 ALLEGRO_BITMAP* enemyShotTemplate;
 ALLEGRO_BITMAP* stage[3];
-ALLEGRO_BITMAP* playerSprites[2];
 ALLEGRO_BITMAP* enemySprite[3];
+ALLEGRO_BITMAP* enemysheet;
 ALLEGRO_BITMAP* enemyShooterSprite;
 ALLEGRO_BITMAP* tileAtlas;
 ALLEGRO_BITMAP* playersheet;
@@ -180,7 +177,7 @@ projectile playerTripleShot[projectileMax];
 entity enemy[enemyMax];
 projectile enemyShot[enemyProjectileMax];
 entity enemyShooter;
-tile tiles[4];
+tile tiles[5];
 objective killCount;
 objective endurance;
 pos mouse;
@@ -361,24 +358,24 @@ void enemyRandomizer(entity* e) {
 	e->alive = true;
 }
 
-int initplayer(entity* c, ALLEGRO_BITMAP* player[]) {
+int initplayer(entity* c, ALLEGRO_BITMAP* player) {
 	int aux = 0;
-	player[neutral] = al_load_bitmap("Img/H/canvas.png");
+	player = al_load_bitmap("Img/playersheet.png");
 	//if (!c->spriteBitmap) {
 	//	fprintf(stderr, "Falha ao carregar imagem!\n");
 	//	return -1;
 	//}
-	al_convert_mask_to_alpha(player[neutral], al_map_rgb(255, 0, 255));
+	//al_convert_mask_to_alpha(player[neutral], al_map_rgb(255, 0, 255));
 
-	player[shooting] = al_load_bitmap("Img/H/canvasS.png");
-	al_convert_mask_to_alpha(player[shooting], al_map_rgb(255, 0, 255));
+	//player[shooting] = al_load_bitmap("Img/H/canvasS.png");
+	//al_convert_mask_to_alpha(player[shooting], al_map_rgb(255, 0, 255));
 
 	c->x = 50 * tileSize;
 	c->y = 50 * tileSize;
-	c->width = al_get_bitmap_width(player[neutral]);
+	c->width = al_get_bitmap_width(player) / 2;
 	aux = c->width / tileSize;
 	c->hbWidth = aux * tileSize;
-	c->height = al_get_bitmap_height(player[neutral]);
+	c->height = al_get_bitmap_height(player) / 2;
 	aux = c->height / tileSize;
 	c->hbHeight = aux * tileSize;
 	c->vel_x = 4.5;
@@ -418,8 +415,8 @@ int initenemy(entity e[], ALLEGRO_BITMAP** enemy) {
 	return 0;
 }
 
-int initenemya(entity* e, ALLEGRO_BITMAP** enemy, int type) {
-	int i, aux = 0;
+int initenemya(entity* e, ALLEGRO_BITMAP* enemy[], int type) {
+	int aux = 0;
 
 	e->attack = type;
 
@@ -441,8 +438,6 @@ int initenemya(entity* e, ALLEGRO_BITMAP** enemy, int type) {
 
 
 void pShoot(projectile* p, entity* c) {
-	c->sprite = shooting;
-
 	p->speed = projectileVelocity;
 	p->accel = projectileAccel;
 
@@ -479,8 +474,6 @@ void pShoot(projectile* p, entity* c) {
 
 //void tripleShot(projectile* p, entity* c) {
 //	int i;
-//
-//	c->sprite = shooting;
 //
 //	p->speed = 0.6;
 //	p->accel = 0.1;
@@ -1007,7 +1000,6 @@ int main() {
 	//devChecker->fim = 0;
 	//devChecker->total = 0;
 	//devChecker->tamanho = queueSize;
-	//initplayer(&player, playerSprites);
 	//initenemy(enemy, &enemySprite);
 	//createTileAtlas();
 
@@ -1034,8 +1026,10 @@ int main() {
 
 	tileAtlas = al_load_bitmap("Img/tilesheet.png");
 	al_convert_mask_to_alpha(tileAtlas, al_map_rgb(255, 0, 255));
-	playersheet = al_load_bitmap("Img/H/playersheet.png");
+	playersheet = al_load_bitmap("Img/playersheet.png");
 	al_convert_mask_to_alpha(playersheet, al_map_rgb(255, 0, 255));
+	enemysheet = al_load_bitmap("Img/enemysheet.png");
+	al_convert_mask_to_alpha(enemysheet, al_map_rgb(255, 0, 255));
 
 	enemySprite[antiBiotic] = al_load_bitmap("Img/bacteria.png");
 	al_convert_mask_to_alpha(enemySprite[antiBiotic], al_map_rgb(255, 0, 255));
@@ -1257,19 +1251,11 @@ int main() {
 
 		while (levelEditor) {
 			ALLEGRO_EVENT event;
-			FILE* edit;
 			al_wait_for_event(evQueue, &event);
 
 			if (event.type == ALLEGRO_EVENT_MOUSE_AXES) {
 				mouse.x = event.mouse.x + cx;
 				mouse.y = event.mouse.y + cy;
-
-				//mouse.x = abs(mouse.x);
-
-				/*sprintf_s(objText, sizeof(objText), "Mouse y = %d", event.mouse.y);
-				al_draw_text(font, al_map_rgb(255, 255, 255), 10, 43, 0, objText);*
-
-				al_flip_display();*/
 
 				player.tileX = mouse.x / tileSize;
 				player.tileY = mouse.y / tileSize;
@@ -1345,22 +1331,22 @@ int main() {
 				switch (event.keyboard.keycode) {
 				case ALLEGRO_KEY_UP:
 				case ALLEGRO_KEY_W:
-					player.vel_y += -8;
+					player.vel_y += -15;
 					break;
 
 				case ALLEGRO_KEY_LEFT:
 				case ALLEGRO_KEY_A:
-					player.vel_x += -8;
+					player.vel_x += -15;
 					break;
 
 				case ALLEGRO_KEY_DOWN:
 				case ALLEGRO_KEY_S:
-					player.vel_y += 8;
+					player.vel_y += 15;
 					break;
 
 				case ALLEGRO_KEY_RIGHT:
 				case ALLEGRO_KEY_D:
-					player.vel_x += 8;
+					player.vel_x += 15;
 					break;
 				case ALLEGRO_KEY_LSHIFT:
 				case ALLEGRO_KEY_RSHIFT:
@@ -1548,7 +1534,7 @@ int main() {
 			}
 		}
 
-		initplayer(&player, playerSprites);
+		initplayer(&player, playersheet);
 		/*for (i = 0; i < enemyMax; i++) {
 			enemy[i].alive = true;
 		}*/
@@ -1568,7 +1554,6 @@ int main() {
 				if (player.isShooting) {
 					if (player.spriteChange >= FPS / 2) {
 						player.spriteChange = 0;
-						player.sprite = neutral;
 						player.isShooting = false;
 					}
 					else player.spriteChange++;
@@ -1869,7 +1854,6 @@ int main() {
 							al_draw_bitmap_region(playersheet, 48, 48, 48, 48, player.x, player.y, ALLEGRO_FLIP_HORIZONTAL);
 						}
 					}
-					//al_draw_bitmap(playerSprites[player.sprite], player.x, player.y, ALLEGRO_FLIP_HORIZONTAL);
 					//al_draw_filled_rectangle(player.hbX, player.hbY, player.hbX + player.hbWidth, player.hbY + player.hbHeight, al_map_rgba(0, 0, 255, 50));
 				}
 				else {
@@ -1889,13 +1873,13 @@ int main() {
 							al_draw_bitmap_region(playersheet, 48, 48, 48, 48, player.x, player.y, 0);
 						}
 					}
-					//al_draw_bitmap(playerSprites[player.sprite], player.x, player.y, 0);
 					//al_draw_filled_rectangle(player.hbX, player.hbY, player.hbX + player.hbWidth, player.hbY + player.hbHeight, al_map_rgba(0, 0, 255, 50));
 				}
 
 				for (i = 0; i < enemyMax; i++) {
 					if (enemy[i].alive) {
 						if (enemy[i].x < player.x) {
+							al_draw_bitmap_region(enemysheet, enemy[i].selectedWeapon * enemy[i].width, enemy[i].selectedWeapon * enemy[i].height, enemy[i].width, enemy[i].height, enemy[i].x, enemy[i].y);
 							al_draw_bitmap(enemySprite[enemy[i].selectedWeapon], enemy[i].x, enemy[i].y, ALLEGRO_FLIP_HORIZONTAL);
 						}
 						else {
@@ -2020,8 +2004,7 @@ int main() {
 	al_destroy_font(font);
 	al_uninstall_keyboard();
 	al_uninstall_mouse();
-	al_destroy_bitmap(playerSprites[neutral]);
-	al_destroy_bitmap(playerSprites[shooting]);
+	al_destroy_bitmap(playersheet);
 	al_destroy_bitmap(enemySprite[antiBiotic]);
 	al_destroy_bitmap(enemySprite[antiMycotic]);
 	al_destroy_bitmap(enemySprite[antiVirus]);
