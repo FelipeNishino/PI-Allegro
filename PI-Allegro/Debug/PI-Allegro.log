@@ -1,13 +1,13 @@
 ﻿  PI-Allegro.c
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(188,13): warning C4013: 'sodium_init' undefined; assuming extern returning int
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(237,18): warning C4047: '=': 'char' differs in levels of indirection from 'char [1]'
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(337,42): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(1620,42): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(1620,42): warning C4024: 'initenemya': different types for formal and actual parameter 2
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(1659,42): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(1659,42): warning C4024: 'initenemya': different types for formal and actual parameter 2
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(1747,42): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(1747,42): warning C4024: 'initenemya': different types for formal and actual parameter 2
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(1755,42): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
-C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(1755,42): warning C4024: 'initenemya': different types for formal and actual parameter 2
-  PI-Allegro.vcxproj -> C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(189,13): warning C4013: 'sodium_init' undefined; assuming extern returning int
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(238,18): warning C4047: '=': 'char' differs in levels of indirection from 'char [1]'
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(338,42): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1623,42): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1623,42): warning C4024: 'initenemya': different types for formal and actual parameter 2
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1662,42): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1662,42): warning C4024: 'initenemya': different types for formal and actual parameter 2
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1750,42): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1750,42): warning C4024: 'initenemya': different types for formal and actual parameter 2
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1758,42): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
+C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1758,42): warning C4024: 'initenemya': different types for formal and actual parameter 2
+  PI-Allegro.vcxproj -> C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe

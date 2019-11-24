@@ -1879,11 +1879,13 @@ int main() {
 				for (i = 0; i < enemyMax; i++) {
 					if (enemy[i].alive) {
 						if (enemy[i].x < player.x) {
-							al_draw_bitmap_region(enemysheet, enemy[i].selectedWeapon * enemy[i].width, enemy[i].selectedWeapon * enemy[i].height, enemy[i].width, enemy[i].height, enemy[i].x, enemy[i].y);
+							al_draw_bitmap_region(enemysheet, enemy[i].selectedWeapon * enemy[i].width, enemy[i].selectedWeapon * enemy[i].height, enemy[i].width, enemy[i].height, enemy[i].x, enemy[i].y, ALLEGRO_FLIP_HORIZONTAL);
 							al_draw_bitmap(enemySprite[enemy[i].selectedWeapon], enemy[i].x, enemy[i].y, ALLEGRO_FLIP_HORIZONTAL);
 						}
 						else {
 							al_draw_bitmap(enemySprite[enemy[i].selectedWeapon], enemy[i].x, enemy[i].y, 0);
+							al_draw_bitmap_region(enemysheet, enemy[i].selectedWeapon* enemy[i].width, enemy[i].selectedWeapon* enemy[i].height, enemy[i].width, enemy[i].height, enemy[i].x, enemy[i].y, 0);
+
 						}
 					}
 				}
