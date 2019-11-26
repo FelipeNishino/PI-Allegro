@@ -377,7 +377,7 @@ void enemyRandomizer(entity* e) {
 	e->alive = true;
 }
 
-int initplayer(entity* c, ALLEGRO_BITMAP* player, int*** m) {
+int initplayer(entity* c, ALLEGRO_BITMAP* player, int* eSPCount, int*** m) {
 	int aux = 0, i, j;
 	player = al_load_bitmap("Img/playersheet.png");
 	//if (!c->spriteBitmap) {
@@ -394,9 +394,9 @@ int initplayer(entity* c, ALLEGRO_BITMAP* player, int*** m) {
 			if (m[ftile][i][j] == pspawn) {
 				c->x = j * tileSize;
 				c->y = i * tileSize;
-
-				i = 100;
-				break;
+			}
+			if (m[ftile][i][j] == espawn) {
+				eSPCount++;
 			}
 		}
 	}
@@ -1028,7 +1028,7 @@ void createTileSet(int* mat) {
 }*/
 
 int main() {
-	int i, j, k, projectileCount = 0, stageSelect = 1, enemyProjectileCount = 0, enemyDmgGauge = 0, hit = 0, hitI[2] = { 0, 0 }, hitII = 0, tilefunc = 0, frameCount = 0, immortalityFC = 0, enemyDeadFC[enemyMax] = { 0, 0 }, runCycle = 0, spawn;
+	int i, j, k, projectileCount = 0, stageSelect = 1, enemyProjectileCount = 0, enemySpawnTileCount = 0, enemyDmgGauge = 0, hit = 0, hitI[2] = { 0, 0 }, hitII = 0, tilefunc = 0, frameCount = 0, immortalityFC = 0, enemyDeadFC[enemyMax] = { 0, 0 }, runCycle = 0, spawn;
 	int*** tileset = NULL;
 	float cx = 0, cy = 0;
 	char mousePos[25] = "", debugInput[2] = "", debugTest[6] = "debug", enemyLifeGauge[5], ptx[8], pty[8], objText[25];
@@ -1092,8 +1092,6 @@ int main() {
 			resetEnemy(&enemy, &enemyShot);
 			exitStage = !exitStage;
 		}
-		
-		
 
 		while (menuLoop) {
 			ALLEGRO_EVENT event;
@@ -1312,7 +1310,7 @@ int main() {
 			fclose(tm);
 		}
 
-		initplayer(&player, playersheet, tileset);
+		initplayer(&player, playersheet, &enemySpawnTileCount, tileset);
 
 		while (levelEditor) {
 			ALLEGRO_EVENT event;
