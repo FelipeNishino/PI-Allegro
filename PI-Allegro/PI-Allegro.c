@@ -75,6 +75,16 @@ enum {
 	semirand,
 	fixed
 };
+enum {
+	gtile,
+	ftile
+};
+enum {
+	none,
+	espawn,
+	pspawn,
+	finish
+};
 
 typedef struct TQueue {
 	int tamanho, inicio, fim, total;
@@ -102,6 +112,7 @@ typedef struct entity {
 	int b;
 	int selectedWeapon;
 	int attack;
+	pos spawnTile;
 	int currentDir;
 	bool isShooting;
 	bool onGround;
@@ -236,9 +247,9 @@ void initQueue(queue* f) {
 	f->fim = 0;
 	f->total = 0;
 	f->tamanho = queueSize;
-	for (i = 0; i < queueSize; i++) {
+	/*for (i = 0; i < queueSize; i++) {
 		f->fila[i] = "";
-	}
+	}*/
 }
 
 bool isQueueEmpty(queue* f) {
@@ -360,8 +371,8 @@ void enemyRandomizer(entity* e) {
 	e->alive = true;
 }
 
-int initplayer(entity* c, ALLEGRO_BITMAP* player) {
-	int aux = 0;
+int initplayer(entity* c, ALLEGRO_BITMAP* player, int*** m) {
+	int aux = 0, i, j;
 	player = al_load_bitmap("Img/playersheet.png");
 	//if (!c->spriteBitmap) {
 	//	fprintf(stderr, "Falha ao carregar imagem!\n");
@@ -372,8 +383,18 @@ int initplayer(entity* c, ALLEGRO_BITMAP* player) {
 	//player[shooting] = al_load_bitmap("Img/H/canvasS.png");
 	//al_convert_mask_to_alpha(player[shooting], al_map_rgb(255, 0, 255));
 
-	c->x = 50 * tileSize;
-	c->y = 50 * tileSize;
+	for (i = 0; i < mapSize; i++) {
+		for (j = 0; j < mapSize; j++) {
+			if (m[ftile][i][j] == pspawn) {
+				c->x = j * tileSize;
+				c->y = i * tileSize;
+
+				i = 100;
+				break;
+			}
+		}
+	}
+
 	c->width = al_get_bitmap_width(player) / 2;
 	aux = c->width / tileSize;
 	c->hbWidth = aux * tileSize;
@@ -598,7 +619,7 @@ void refreshProjectileState(projectile p[], projectile e[], entity c, int* cpCou
 	}
 }
 
-void refreshPlayerMovement(entity* p, tile t[], int** m) {
+void refreshPlayerMovement(entity* p, tile t[], int*** m) {
 	int botTile, btID, upTile, upID, ltTile, ltID, rtTile, rtID, ctID;
 
 	p->hbX = (p->x + (p->width / 2)) - p->hbWidth / 2;
@@ -611,16 +632,16 @@ void refreshPlayerMovement(entity* p, tile t[], int** m) {
 	p->tileY = p->hbY / tileSize;
 
 	botTile = p->tileY + (p->hbHeight / tileSize);
-	btID = m[botTile][p->tileX];
+	btID = m[gtile][botTile][p->tileX];
 
 	upTile = p->tileY;
-	upID = m[upTile][p->tileX];
+	upID = m[gtile][upTile][p->tileX];
 
 	ltTile = p->tileX;
-	ltID = m[p->tileY][ltTile];
+	ltID = m[gtile][p->tileY][ltTile];
 
 	rtTile = p->tileX + (p->hbWidth / tileSize);
-	rtID = m[p->tileY][rtTile];
+	rtID = m[gtile][p->tileY][rtTile];
 
 	switch (p->dir) {
 	case Right:
@@ -632,7 +653,7 @@ void refreshPlayerMovement(entity* p, tile t[], int** m) {
 		if (!t[ltID].isSolid) {
 			currentTile.x = (player.x - player.vel_x) / tileSize;
 			currentTile.y = player.y / tileSize;
-			ctID = m[currentTile.y][currentTile.x];
+			ctID = m[gtile][currentTile.y][currentTile.x];
 			if (!t[ctID].isSolid) {
 				player.x -= player.vel_x;
 			}
@@ -1002,8 +1023,8 @@ void createTileSet(int* mat) {
 
 int main() {
 	sfx_hit = al_load_sample("Audio/hit.wav");
-	int i, j, projectileCount = 0, stageSelect = 1, enemyProjectileCount = 0, enemyDmgGauge = 0, hit = 0, hitI[2] = { 0, 0 }, hitII = 0, frameCount = 0, immortalityFC = 0, enemyDeadFC[enemyMax] = { 0, 0 }, runCycle = 0, spawn;
-	int** tileset = NULL;
+	int i, j, k, projectileCount = 0, stageSelect = 1, enemyProjectileCount = 0, enemyDmgGauge = 0, hit = 0, hitI[2] = { 0, 0 }, hitII = 0, tilefunc = 0, frameCount = 0, immortalityFC = 0, enemyDeadFC[enemyMax] = { 0, 0 }, runCycle = 0, spawn;
+	int*** tileset = NULL;
 	float cx = 0, cy = 0;
 	char mousePos[25] = "", debugInput[2] = "", debugTest[6] = "debug", enemyLifeGauge[5], ptx[8], pty[8], objText[25];
 	bool gameLoop = false, menuLoop = true, toggleStartText = false, exit = false, devMode = false, modDown = false, levelEditor = false, exitStage = false;
@@ -1238,10 +1259,17 @@ int main() {
 			}
 		}
 
-		tileset = (int**)malloc(mapSize * sizeof(int*));
+		tileset = (int***)malloc(2 * sizeof(int**));
+		
 		if (tileset) {
-			for (i = 0; i < mapSize; ++i) {
-				tileset[i] = (int*)malloc(mapSize * sizeof(int));
+			for (i = 0; i < 2; i++) {
+				tileset[i] = (int**)malloc(mapSize * sizeof(int*));
+			}
+			
+			for (i = 0; i < 2; ++i) {
+				for (j = 0; j < mapSize; j++) {
+					tileset[i][j] = (int*)malloc(mapSize * sizeof(int));
+				}
 			}
 
 			switch (stageSelect) {
@@ -1259,18 +1287,22 @@ int main() {
 				break;*/
 			}
 
-			for (i = 0; i < mapSize; i++) {
+			for (i = 0; i < 2; i++) {
 				for (j = 0; j < mapSize; j++) {
-					fscanf_s(tm, "%d", &tileset[i][j]);
+					for (k = 0; k < mapSize; k++) {
+						fscanf_s(tm, "%d", &tileset[i][j][k]);
+					}
 				}
 			}
 
 			fclose(tm);
 		}
 
+		initplayer(&player, playersheet, tileset);
+
 		al_stop_samples();
 		al_play_sample(bgm1, 0.025, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
-
+		
 		while (levelEditor) {
 			ALLEGRO_EVENT event;
 			al_wait_for_event(evQueue, &event);
@@ -1286,7 +1318,7 @@ int main() {
 			if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
 				if (event.mouse.button == 1) {
 					if (!modDown) {
-						tileset[player.tileY][player.tileX] = player.selectedWeapon;
+						tileset[gtile][player.tileY][player.tileX] = player.selectedWeapon;
 						editorClick.x = player.tileX;
 						editorClick.y = player.tileY;
 					}
@@ -1294,24 +1326,24 @@ int main() {
 						if (editorClick.x == player.tileX) {
 							if (player.tileY > editorClick.y) {
 								for (i = editorClick.y; i <= player.tileY; i++) {
-									tileset[i][player.tileX] = player.selectedWeapon;
+									tileset[gtile][i][player.tileX] = player.selectedWeapon;
 								}
 							}
 							if (player.tileY < editorClick.y) {
 								for (i = editorClick.y; i >= player.tileY; i--) {
-									tileset[i][player.tileX] = player.selectedWeapon;
+									tileset[gtile][i][player.tileX] = player.selectedWeapon;
 								}
 							}
 						}
 						else if (editorClick.y == player.tileY) {
 							if (player.tileX > editorClick.x) {
 								for (i = editorClick.x; i <= player.tileX; i++) {
-									tileset[player.tileY][i] = player.selectedWeapon;
+									tileset[gtile][player.tileY][i] = player.selectedWeapon;
 								}
 							}
 							if (player.tileX < editorClick.x) {
 								for (i = editorClick.x; i >= player.tileX; i--) {
-									tileset[player.tileY][i] = player.selectedWeapon;
+									tileset[gtile][player.tileY][i] = player.selectedWeapon;
 								}
 							}
 						}
@@ -1319,6 +1351,42 @@ int main() {
 						editorClick.y = player.tileY;
 					}
 				}
+				else if (event.mouse.button == 2) {
+					if (!modDown) {
+						tileset[ftile][player.tileY][player.tileX] = tilefunc;
+						editorClick.x = player.tileX;
+						editorClick.y = player.tileY;
+					}
+					else {
+						if (editorClick.x == player.tileX) {
+							if (player.tileY > editorClick.y) {
+								for (i = editorClick.y; i <= player.tileY; i++) {
+									tileset[ftile][i][player.tileX] = tilefunc;
+								}
+							}
+							if (player.tileY < editorClick.y) {
+								for (i = editorClick.y; i >= player.tileY; i--) {
+									tileset[ftile][i][player.tileX] = tilefunc;
+								}
+							}
+						}
+						else if (editorClick.y == player.tileY) {
+							if (player.tileX > editorClick.x) {
+								for (i = editorClick.x; i <= player.tileX; i++) {
+									tileset[ftile][player.tileY][i] = tilefunc;
+								}
+							}
+							if (player.tileX < editorClick.x) {
+								for (i = editorClick.x; i >= player.tileX; i--) {
+									tileset[ftile][player.tileY][i] = tilefunc;
+								}
+							}
+						}
+						editorClick.x = player.tileX;
+						editorClick.y = player.tileY;
+					}
+				}
+
 			}
 
 			if (event.type == ALLEGRO_EVENT_TIMER) {
@@ -1380,11 +1448,22 @@ int main() {
 						player.selectedWeapon = 4;
 					}
 					break;
-
 				case ALLEGRO_KEY_E:
 					player.selectedWeapon++;
 					if (player.selectedWeapon > 4) {
 						player.selectedWeapon = 0;
+					}
+					break;
+				case ALLEGRO_KEY_Z:
+					tilefunc--;
+					if (tilefunc < 0) {
+						tilefunc = 3;
+					}
+					break;
+				case ALLEGRO_KEY_C:
+					tilefunc++;
+					if (tilefunc > 3) {
+						tilefunc = 0;
 					}
 					break;
 				case ALLEGRO_KEY_ENTER:
@@ -1403,13 +1482,15 @@ int main() {
 						break;*/
 					}
 
-					for (i = 0; i < mapSize; i++) {
+					for (i = 0; i < 2; i++) {
 						for (j = 0; j < mapSize; j++) {
-							if (j == mapSize - 1) {
-								fprintf(tm, "%d\n", tileset[i][j]);
-							}
-							else {
-								fprintf(tm, "%d ", tileset[i][j]);
+							for (k = 0; k < mapSize; k++) {
+								if (k == mapSize - 1) {
+									fprintf(tm, "%d\n", tileset[i][j][k]);
+								}
+								else {
+									fprintf(tm, "%d ", tileset[i][j][k]);
+								}
 							}
 						}
 					}
@@ -1488,24 +1569,38 @@ int main() {
 				al_translate_transform(&camera, -cx, -cy);
 				al_use_transform(&camera);
 
-				for (i = 0; i < mapSize; i++) {
+				for (i = 0; i < 2; i++) {
 					for (j = 0; j < mapSize; j++) {
-						switch (tileset[i][j]) {
-						case chaoesq:
-							al_draw_bitmap_region(tileAtlas, 0, 0, tileSize, tileSize, j * tileSize, i * tileSize, 0);
-							break;
-						case chaomeio:
-							al_draw_bitmap_region(tileAtlas, tileSize, 0, tileSize, tileSize, j * tileSize, i * tileSize, 0);
-							break;
-						case chaodir:
-							al_draw_bitmap_region(tileAtlas, 2 * tileSize, 0, tileSize, tileSize, j * tileSize, i * tileSize, 0);
-							break;
-						case chao:
-							al_draw_bitmap_region(tileAtlas, 3 * tileSize, 0, tileSize, tileSize, j * tileSize, i * tileSize, 0);
-							break;
-						case air:
-							//al_draw_rectangle(j* tileSize, i* tileSize, j* tileSize + tileSize, i* tileSize + tileSize, al_map_rgb(255, 0, 0), 2);
-							break;
+						for (k = 0; k < mapSize; k++) {
+							if (i == gtile)	{
+								switch (tileset[gtile][j][k]) {
+								case chaoesq:
+									al_draw_bitmap_region(tileAtlas, 0, 0, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chaomeio:
+									al_draw_bitmap_region(tileAtlas, tileSize, 0, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chaodir:
+									al_draw_bitmap_region(tileAtlas, 2 * tileSize, 0, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chao:
+									al_draw_bitmap_region(tileAtlas, 3 * tileSize, 0, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								}
+							}
+							else {
+								switch (tileset[ftile][j][k]) {
+								case espawn:
+									al_draw_text(font, al_map_rgb(0, 0, 0), k * tileSize + tileSize / 2, j * tileSize, 0, "E");
+									break;
+								case pspawn:
+									al_draw_text(font, al_map_rgb(0, 0, 0), k * tileSize + tileSize / 2, j * tileSize, 0, "P");
+									break;
+								case finish:
+									al_draw_text(font, al_map_rgb(0, 0, 0), k * tileSize + tileSize / 2, j * tileSize, 0, "F");
+									break;
+								}
+							}
 						}
 					}
 				}
@@ -1542,25 +1637,34 @@ int main() {
 					break;
 				}
 
+				switch (tilefunc) {
+				case none:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 44, 0, "Selected function = none");
+					break;
+				case espawn:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 44, 0, "Selected function = enemy spawn");
+						break;
+				case pspawn:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 44, 0, "Selected function = player spawn");
+						break;
+				case finish:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 44, 0, "Selected function = finish tile");
+						break;
+				}
+
 				if (devMode) {
 					al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, 0, ALLEGRO_ALIGN_CENTER, "Dev mode!!");
 				}
 
-				al_draw_text(font, al_map_rgb(255, 255, 255), 10, 63, 0, mousePos);
+				al_draw_text(font, al_map_rgb(255, 255, 255), 10, 73, 0, mousePos);
 				sprintf_s(ptx, sizeof(ptx), "X = %d", player.tileX);
-				al_draw_text(font, al_map_rgb(255, 255, 255), 10, 50, 0, ptx);
+				al_draw_text(font, al_map_rgb(255, 255, 255), 10, 60, 0, ptx);
 				sprintf_s(pty, sizeof(pty), "Y = %d", player.tileY);
-				al_draw_text(font, al_map_rgb(255, 255, 255), 100, 50, 0, pty);
+				al_draw_text(font, al_map_rgb(255, 255, 255), 100, 60, 0, pty);
 
 				al_flip_display();
 			}
 		}
-
-		initplayer(&player, playersheet);
-		/*for (i = 0; i < enemyMax; i++) {
-			enemy[i].alive = true;
-		}*/
-		//initenemy(enemy, &enemySprite);
 
 		while (gameLoop) {
 			ALLEGRO_EVENT event;
@@ -1599,11 +1703,9 @@ int main() {
 							}
 						}
 					}
-				}
 
-				//Bullet hell lmao
-				/*for (j = 0; j < enemyMax; j++) {
-					if (enemy[j].attack == shooter) {
+					// Bullet hell lmao
+					/*if (enemy[j].attack == shooter) {
 						for (i = 0; i < enemyProjectileMax; i++) {
 							if (frameCount - enemy[i].shotFC >= FPS) {
 								if (!enemyShot[i].projectileTravel) {
@@ -1613,8 +1715,8 @@ int main() {
 								}
 							}
 						}
-					}
-				}*/
+					}*/
+				}
 
 				hitboxDetection(playerShot, enemy, &player, &killCount, hitI, &projectileCount, &immortalityFC, enemyDeadFC, &frameCount);
 				hitboxDetection(enemyShot, enemy, &player, &killCount, hitI, &projectileCount, &immortalityFC, enemyDeadFC, &frameCount);
@@ -1845,24 +1947,38 @@ int main() {
 				al_translate_transform(&camera, -cx, -cy);
 				al_use_transform(&camera);
 				
-				for (i = 0; i < mapSize; i++) {
+				for (i = 0; i < 2; i++) {
 					for (j = 0; j < mapSize; j++) {
-						switch (tileset[i][j]) {
-						case chaoesq:
-							al_draw_bitmap_region(tileAtlas, 0, 0, tileSize, tileSize, j * tileSize, i * tileSize, 0);
-							break;
-						case chaomeio:
-							al_draw_bitmap_region(tileAtlas, tileSize, 0, tileSize, tileSize, j * tileSize, i * tileSize, 0);
-							break;
-						case chaodir:
-							al_draw_bitmap_region(tileAtlas, 2 * tileSize, 0, tileSize, tileSize, j * tileSize, i * tileSize, 0);
-							break;
-						case chao:
-							al_draw_bitmap_region(tileAtlas, 3 * tileSize, 0, tileSize, tileSize, j * tileSize, i * tileSize, 0);
-							break;
-						case air:
-							//al_draw_rectangle(j* tileSize, i* tileSize, j* tileSize + tileSize, i* tileSize + tileSize, al_map_rgb(255, 0, 0), 2);
-							break;
+						for (k = 0; k < mapSize; k++) {
+							if (i == gtile) {
+								switch (tileset[gtile][j][k]) {
+								case chaoesq:
+									al_draw_bitmap_region(tileAtlas, 0, 0, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chaomeio:
+									al_draw_bitmap_region(tileAtlas, tileSize, 0, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chaodir:
+									al_draw_bitmap_region(tileAtlas, 2 * tileSize, 0, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chao:
+									al_draw_bitmap_region(tileAtlas, 3 * tileSize, 0, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								}
+							}
+							else {
+								switch (tileset[ftile][j][k]) {
+								case espawn:
+									al_draw_text(font, al_map_rgb(0, 0, 0), k * tileSize + tileSize / 2, j * tileSize, 0, "E");
+									break;
+								case pspawn:
+									al_draw_text(font, al_map_rgb(0, 0, 0), k * tileSize + tileSize / 2, j * tileSize, 0, "P");
+									break;
+								case finish:
+									al_draw_text(font, al_map_rgb(0, 0, 0), k * tileSize + tileSize / 2, j * tileSize, 0, "F");
+									break;
+								}
+							}
 						}
 					}
 				}
