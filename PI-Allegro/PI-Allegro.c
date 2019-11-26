@@ -96,6 +96,7 @@ typedef struct entity {
 	float hbX, hbY;
 	int spriteChange;
 	int shotFC;
+	int rotate;
 	int r;
 	int g;
 	int b;
@@ -151,7 +152,8 @@ struct progresso {
 ALLEGRO_DISPLAY* display = NULL;
 ALLEGRO_FONT* font = NULL;
 ALLEGRO_TIMER* timer = NULL;
-ALLEGRO_SAMPLE* sample = NULL;
+ALLEGRO_SAMPLE* bgm1 = NULL;
+ALLEGRO_SAMPLE_ID* bgm1_id;
 ALLEGRO_SAMPLE* shot = NULL;
 ALLEGRO_SAMPLE* sfx_jump = NULL;
 ALLEGRO_SAMPLE* sfx_sp1 = NULL;
@@ -208,7 +210,7 @@ int initialize() {
 	sfx_sp1 = al_load_sample("Audio/spawn.wav");
 	shot = al_load_sample("Audio/tiro.ogg");
 	sfx_jump = al_load_sample("Audio/jump.wav");
-	sample = al_load_sample("Audio/bg_music.ogg");
+	bgm1 = al_load_sample("Audio/bg_music.ogg");
 	playerShotTemplate[0] = al_load_bitmap("Img/tiro.png");
 	playerShotTemplate[1] = al_load_bitmap("Img/tiro2.png");
 	al_convert_mask_to_alpha(playerShotTemplate[0], al_map_rgb(255, 0, 255));
@@ -348,7 +350,7 @@ void enemyRandomizer(entity* e) {
 
 	e->y = player.y + randombytes_uniform(101);
 
-	e->selectedWeapon = randombytes_uniform(3);
+	e->selectedWeapon = 2;// randombytes_uniform(3);
 
 	setSpriteColor(e);
 
@@ -425,11 +427,18 @@ int initenemya(entity* e, ALLEGRO_BITMAP* enemy[], int type) {
 
 	e->vel_x = 0;
 	e->vel_y = 0;
+	e->rotate = 0;
 
-	e->width = al_get_bitmap_width(*enemy);
+	for (aux = 0; aux < 3; aux++) {
+		if (aux == e->selectedWeapon) {
+			e->width = al_get_bitmap_width(enemy[aux]);
+			e->height = al_get_bitmap_height(enemy[aux]);
+			break;
+		}
+	}
+
 	aux = e->width / tileSize;
 	e->hbWidth = aux * tileSize;
-	e->height = al_get_bitmap_height(*enemy);
 	aux = e->height / tileSize;
 	e->hbHeight = aux * tileSize;
 
@@ -523,18 +532,9 @@ void eShoot(projectile* p, entity* e, entity* c, int fc) {
 
 	p->dir = e->currentDir;
 
-	/*p->angle = atan2((-1.0 * e->y) + (-1.0 * c->hbY), (double)e->x + c->hbX);
-	p->angle = p->angle * 180.0 / PI;
-	p->angle = (float)p->angle;
-	p->cos = cos(p->angle);
-	p->sin = sin(p->angle);
-	absF(&p->cos);
-	absF(&p->sin);
-	//absD(&angle);*/
-
-	p->angle = atan2((double)e->y - c->y, (double)c->x - e->x);
-	p->angle = p->angle * 180.0 / PI;
-	p->angle = (float)p->angle;
+	p->angle = atan2((double)(-1.0 * (e->hbY + e->hbHeight / 2.0)) - (-1.0 * (c->hbY + c->hbHeight / 2.0)), (double)c->hbX + c->hbWidth / 2 - e->hbX + e->hbWidth);
+	//p->angle = p->angle * 180.0 / PI;
+	//p->angle = (float)p->angle;
 	p->cos = cos(p->angle);
 	p->sin = sin(p->angle);
 	//absF(&p->cos);
@@ -743,7 +743,22 @@ void refreshPlayerMovement(entity* p, tile t[], int** m) {
 	}
 }*/
 
+void resetEnemy(entity e[], projectile p[]) {
+	int i;
+
+	for (i = 0; i < enemyProjectileMax; i++) {
+		p[i].projectileTravel = false;
+	}
+	
+	for (i = 0; i < enemyMax; i++) {
+		e[i].alive = false;
+	}
+}
+
 void refreshEnemyMovement(entity* e, entity* p) {
+	e->hbX = (e->x + (e->width / 2)) - e->hbWidth / 2;
+	e->hbY = (e->y + (e->height - e->hbHeight));
+
 	if (e->attack == contact) {
 		if (e->x != p->hbX && e->alive) {
 			if (e->x > p->hbX) {
@@ -991,7 +1006,7 @@ int main() {
 	int** tileset = NULL;
 	float cx = 0, cy = 0;
 	char mousePos[25] = "", debugInput[2] = "", debugTest[6] = "debug", enemyLifeGauge[5], ptx[8], pty[8], objText[25];
-	bool gameLoop = false, menuLoop = true, toggleStartText = false, exit = false, devMode = false, modDown = false, levelEditor = false;
+	bool gameLoop = false, menuLoop = true, toggleStartText = false, exit = false, devMode = false, modDown = false, levelEditor = false, exitStage = false;
 	queue devChecker;
 
 	initialize();
@@ -1043,6 +1058,12 @@ int main() {
 	al_clear_to_color(al_map_rgb(255, 255, 255));
 
 	while (!exit) {
+		if (exitStage)	{
+			al_stop_samples();
+			resetEnemy(&enemy, &enemyShot);
+			exitStage = !exitStage;
+		}
+
 		while (menuLoop) {
 			ALLEGRO_EVENT event;
 			al_wait_for_event(evQueue, &event);
@@ -1247,7 +1268,8 @@ int main() {
 			fclose(tm);
 		}
 
-		al_play_sample(sample, 0.025, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
+		al_stop_samples();
+		al_play_sample(bgm1, 0.025, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
 
 		while (levelEditor) {
 			ALLEGRO_EVENT event;
@@ -1561,7 +1583,12 @@ int main() {
 				
 				for (j = 0; j < enemyMax; j++) {
 					refreshEnemyMovement(&enemy[j], &player);
-					if (enemy[j].attack == shooter) {
+
+					if (enemy[j].selectedWeapon == antiMycotic && frameCount % 3 == 0) {
+						enemy[j].rotate++;
+					}
+
+					if (enemy[j].attack == shooter && enemy[j].alive) {
 						for (i = 0; i < enemyProjectileMax; i++) {
 							if (frameCount - enemy[j].shotFC >= FPS) {
 								if (!enemyShot[i].projectileTravel) {
@@ -1598,6 +1625,7 @@ int main() {
 					player.alive = false;
 					menuLoop = true;
 					gameLoop = false;
+					exitStage = true;
 				}
 				if (player.immortality && frameCount - immortalityFC >= (int)(1.5 * FPS)) {
 					player.immortality = false;
@@ -1653,6 +1681,7 @@ int main() {
 						adv.m1 = true;
 						menuLoop = true;
 						gameLoop = false;
+						exitStage = true;
 					}
 					break;
 				case 2:
@@ -1668,6 +1697,7 @@ int main() {
 						adv.m2 = true;
 						menuLoop = true;
 						gameLoop = false;
+						exitStage = true;
 					}
 					break;
 				}
@@ -1878,14 +1908,21 @@ int main() {
 
 				for (i = 0; i < enemyMax; i++) {
 					if (enemy[i].alive) {
-						if (enemy[i].x < player.x) {
-							al_draw_bitmap_region(enemysheet, enemy[i].selectedWeapon * enemy[i].width, enemy[i].selectedWeapon * enemy[i].height, enemy[i].width, enemy[i].height, enemy[i].x, enemy[i].y, ALLEGRO_FLIP_HORIZONTAL);
-							al_draw_bitmap(enemySprite[enemy[i].selectedWeapon], enemy[i].x, enemy[i].y, ALLEGRO_FLIP_HORIZONTAL);
+						if (enemy[i].selectedWeapon == antiMycotic) {
+							if (enemy[i].x < player.x)
+								al_draw_tinted_scaled_rotated_bitmap_region(enemysheet, enemy[i].selectedWeapon * enemy[i].width, 0, enemy[i].width, enemy[i].height, al_map_rgb_f(1, 1, 1), enemy[i].width / 2, enemy[i].height / 2, enemy[i].x, enemy[i].y, 1, 1, enemy[i].rotate, ALLEGRO_FLIP_HORIZONTAL);
+							else
+								al_draw_tinted_scaled_rotated_bitmap_region(enemysheet, enemy[i].selectedWeapon * enemy[i].width, 0, enemy[i].width, enemy[i].height, al_map_rgb_f(1, 1, 1), enemy[i].width / 2, enemy[i].height / 2, enemy[i].x, enemy[i].y, 1, 1, enemy[i].rotate, 0);
 						}
 						else {
-							al_draw_bitmap(enemySprite[enemy[i].selectedWeapon], enemy[i].x, enemy[i].y, 0);
-							al_draw_bitmap_region(enemysheet, enemy[i].selectedWeapon* enemy[i].width, enemy[i].selectedWeapon* enemy[i].height, enemy[i].width, enemy[i].height, enemy[i].x, enemy[i].y, 0);
-
+							if (enemy[i].x < player.x) {
+								al_draw_bitmap_region(enemysheet, enemy[i].selectedWeapon * enemy[i].width + 1, enemy[i].selectedWeapon * enemy[i].height, enemy[i].width, enemy[i].height, enemy[i].x, enemy[i].y, ALLEGRO_FLIP_HORIZONTAL);
+								//al_draw_bitmap(enemySprite[enemy[i].selectedWeapon], enemy[i].x, enemy[i].y, ALLEGRO_FLIP_HORIZONTAL);
+							}
+							else {
+								//al_draw_bitmap(enemySprite[enemy[i].selectedWeapon], enemy[i].x, enemy[i].y, 0);
+								al_draw_bitmap_region(enemysheet, enemy[i].selectedWeapon * enemy[i].width + 1, enemy[i].selectedWeapon * enemy[i].height, enemy[i].width, enemy[i].height, enemy[i].x, enemy[i].y, 0);
+							}
 						}
 					}
 				}
@@ -1894,8 +1931,7 @@ int main() {
 					if (playerShot[i].projectileTravel) {
 						setProjectileColor(&playerShot[i]);
 						if (playerShot[i].dir == Right) {
-							if (playerShot[i].angle == 0)
-							{
+							if (playerShot[i].angle == 0) {
 								al_draw_tinted_bitmap(playerShotTemplate[0], al_map_rgb(playerShot[i].r, playerShot[i].g, playerShot[i].b), playerShot[i].x, playerShot[i].y, ALLEGRO_FLIP_HORIZONTAL);
 							}
 							else {
@@ -1904,8 +1940,7 @@ int main() {
 							
 						}
 						else {
-							if (playerShot[i].angle == 0)
-							{
+							if (playerShot[i].angle == 0) {
 								al_draw_tinted_bitmap(playerShotTemplate[0], al_map_rgb(playerShot[i].r, playerShot[i].g, playerShot[i].b), playerShot[i].x, playerShot[i].y, 0);
 							}
 							else {
@@ -2017,7 +2052,7 @@ int main() {
 	al_destroy_bitmap(playerShotTemplate[0]);
 	al_destroy_bitmap(playerShotTemplate[1]);
 	al_destroy_bitmap(enemyShotTemplate);
-	al_destroy_sample(sample);
+	al_destroy_sample(bgm1);
 	free(tileset);
 
 	return 0;
