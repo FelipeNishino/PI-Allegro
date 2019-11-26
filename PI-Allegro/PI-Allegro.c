@@ -153,6 +153,9 @@ ALLEGRO_DISPLAY* display = NULL;
 ALLEGRO_FONT* font = NULL;
 ALLEGRO_TIMER* timer = NULL;
 ALLEGRO_SAMPLE* bgm1 = NULL;
+ALLEGRO_SAMPLE* bgm2 = NULL;
+ALLEGRO_SAMPLE* bgm3 = NULL;
+ALLEGRO_SAMPLE* sfx_select = NULL;
 ALLEGRO_SAMPLE_ID* bgm1_id;
 ALLEGRO_SAMPLE* shot = NULL;
 ALLEGRO_SAMPLE* sfx_jump = NULL;
@@ -210,7 +213,10 @@ int initialize() {
 	sfx_sp1 = al_load_sample("Audio/spawn.wav");
 	shot = al_load_sample("Audio/tiro.ogg");
 	sfx_jump = al_load_sample("Audio/jump.wav");
-	bgm1 = al_load_sample("Audio/bg_music.ogg");
+	bgm1 = al_load_sample("Audio/menu_bg.ogg");
+	bgm2 = al_load_sample("Audio/fase1.ogg");
+	bgm3 = al_load_sample("Audio/fase2.ogg");
+	sfx_select = al_load_sample("Audio/select.ogg");
 	playerShotTemplate[0] = al_load_bitmap("Img/tiro.png");
 	playerShotTemplate[1] = al_load_bitmap("Img/tiro2.png");
 	al_convert_mask_to_alpha(playerShotTemplate[0], al_map_rgb(255, 0, 255));
@@ -1001,13 +1007,14 @@ void createTileSet(int* mat) {
 }*/
 
 int main() {
-	sfx_hit = al_load_sample("Audio/hit.wav");
 	int i, j, projectileCount = 0, stageSelect = 1, enemyProjectileCount = 0, enemyDmgGauge = 0, hit = 0, hitI[2] = { 0, 0 }, hitII = 0, frameCount = 0, immortalityFC = 0, enemyDeadFC[enemyMax] = { 0, 0 }, runCycle = 0, spawn;
 	int** tileset = NULL;
 	float cx = 0, cy = 0;
 	char mousePos[25] = "", debugInput[2] = "", debugTest[6] = "debug", enemyLifeGauge[5], ptx[8], pty[8], objText[25];
 	bool gameLoop = false, menuLoop = true, toggleStartText = false, exit = false, devMode = false, modDown = false, levelEditor = false, exitStage = false;
 	queue devChecker;
+
+		
 
 	initialize();
 	initQueue(&devChecker);
@@ -1056,13 +1063,16 @@ int main() {
 	al_convert_mask_to_alpha(enemySprite[antiVirus], al_map_rgb(255, 0, 255));
 
 	al_clear_to_color(al_map_rgb(255, 255, 255));
-
+	al_play_sample(bgm1, 1, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
 	while (!exit) {
 		if (exitStage)	{
 			al_stop_samples();
+			al_play_sample(bgm1, 1, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
 			resetEnemy(&enemy, &enemyShot);
 			exitStage = !exitStage;
 		}
+		
+		
 
 		while (menuLoop) {
 			ALLEGRO_EVENT event;
@@ -1246,10 +1256,14 @@ int main() {
 
 			switch (stageSelect) {
 			case 1:
+				al_stop_samples();
 				fopen_s(&tm, "Tiles/tilemap1.txt", "r");
+				al_play_sample(bgm2, 0.25, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
 				break;
 			case 2:
+				al_stop_samples();
 				fopen_s(&tm, "Tiles/tilemap2.txt", "r");
+				al_play_sample(bgm3, 0.25, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
 				break;
 			/*case 3:
 				fopen_s(&tm, "Tiles/tilemap3.txt", "r");
@@ -1268,8 +1282,7 @@ int main() {
 			fclose(tm);
 		}
 
-		al_stop_samples();
-		al_play_sample(bgm1, 0.025, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
+		
 
 		while (levelEditor) {
 			ALLEGRO_EVENT event;
