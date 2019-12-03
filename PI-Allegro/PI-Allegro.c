@@ -11,8 +11,8 @@
 #include <allegro5/allegro_primitives.h>
 
 #define FPS 60
-#define windowWidth 800
-#define windowHeight 450
+#define windowWidth 1440
+#define windowHeight 900
 #define worldWidth 1000
 #define worldHeight 1000
 
@@ -52,10 +52,22 @@ enum {
 };
 enum {
 	air,
-	chaoesq,
-	chaomeio,
-	chaodir,
-	chao
+	chaoce,
+	chaoc,
+	chaocd,
+	chao1wt,
+	chaome,
+	chaom,
+	chaomd,
+	chao1wm,
+	chaobe,
+	chaob,
+	chaobd,
+	chao1wb,
+	chao1he,
+	chao1hm,
+	chao1hd,
+	chaounico
 };
 enum {
 	projectileI,
@@ -167,7 +179,6 @@ ALLEGRO_SAMPLE* bgm1 = NULL;
 ALLEGRO_SAMPLE* bgm2 = NULL;
 ALLEGRO_SAMPLE* bgm3 = NULL;
 ALLEGRO_SAMPLE* sfx_select = NULL;
-ALLEGRO_SAMPLE_ID* bgm1_id;
 ALLEGRO_SAMPLE* shot = NULL;
 ALLEGRO_SAMPLE* sfx_jump = NULL;
 ALLEGRO_SAMPLE* sfx_sp1 = NULL;
@@ -184,6 +195,13 @@ ALLEGRO_BITMAP* enemysheet;
 ALLEGRO_BITMAP* enemyShooterSprite;
 ALLEGRO_BITMAP* tileAtlas;
 ALLEGRO_BITMAP* playersheet;
+ALLEGRO_BITMAP* titulo;
+ALLEGRO_BITMAP* btnf1;
+ALLEGRO_BITMAP* btnf2;
+ALLEGRO_BITMAP* btnle;
+ALLEGRO_BITMAP* btnf1S;
+ALLEGRO_BITMAP* btnf2S;
+ALLEGRO_BITMAP* btnleS;
 ALLEGRO_FILE* txtmap;
 ALLEGRO_TRANSFORM camera;
 FILE* tm;
@@ -193,7 +211,7 @@ projectile playerTripleShot[projectileMax];
 entity enemy[enemyMax];
 projectile enemyShot[enemyProjectileMax];
 entity enemyShooter;
-tile tiles[5];
+tile tiles[17];
 objective killCount;
 objective endurance;
 pos mouse;
@@ -609,6 +627,76 @@ void refreshPlayerMovement(entity* p, tile t[], int*** m) {
 	botTile = p->tileY + (p->hbHeight / tileSize);
 	btID = m[gtile][botTile][p->tileX];
 
+	upTile = (p->hbY - 1) / tileSize;
+	upID = m[gtile][upTile][p->tileX];
+
+	ltTile = (p->hbX - 1) / tileSize;
+	ltID = m[gtile][p->tileY][ltTile];
+
+	rtTile = (p->hbX + p->hbWidth + 1) / tileSize;
+	rtID = m[gtile][p->tileY][rtTile];
+
+	switch (p->dir) {
+	case Right:
+		if (!t[rtID].isSolid) {
+			p->x += p->vel_x;
+		}
+		/*else {
+			player.x = (rtTile - 1) * tileSize;
+		}*/
+		break;
+	case Left:
+		if (!t[ltID].isSolid) {
+			p->x -= p->vel_x;
+		}
+		if (t[m[gtile][p->tileY][(int)p->x / tileSize]].isSolid) {
+			p->x = p->x0;
+		}
+		break;
+	}
+
+	if (t[upID].isSolid) {
+		p->vel_y = 1;
+	}
+
+	if (t[btID].isSolid && p->vel_y >= 0 && p->y >= botTile - tileSize) {
+		p->onGround = true;
+		p->hitCeiling = false;
+		p->vel_y = 0;
+		p->hbY -= (int)p->hbY % (tileSize * (p->hbHeight / tileSize));
+		p->y = p->hbY - (p->height - p->hbHeight);
+	}
+	else {
+		p->onGround = false;
+		p->vel_y += gravity;
+		p->y += p->vel_y;
+	}
+}
+//if (t[btID].isSolid && p->vel_y >= 0) {
+//	p->onGround = true;
+//	p->vel_y = 0;
+//	p->y -= ((int)p->hbY % tileSize);
+//}
+//else {
+//	p->onGround = false;
+//	p->vel_y += gravity;
+//	p->y += p->vel_y;
+//}
+void refreshPlayerMovement2(entity* p, tile t[], int*** m) {
+	int botTile, btID, upTile, upID, ltTile, ltID, rtTile, rtID, ctID;
+
+	p->hbX = (p->x + (p->width / 2)) - p->hbWidth / 2;
+	p->hbY = (p->y + (p->height - p->hbHeight));
+
+	p->x0 = p->x;
+	p->y0 = p->y;
+
+	p->tileX = p->hbX / tileSize;
+	p->tileY = p->hbY / tileSize;
+
+	botTile = p->tileY + (p->hbHeight / tileSize);
+	btID = m[gtile][botTile][p->tileX];
+
 	upTile = p->tileY;
 	upID = m[gtile][upTile][p->tileX];
 
@@ -878,17 +966,53 @@ int main() {
 	tiles[air].isSolid = false;
 	tiles[air].id = air;
 
-	tiles[chaoesq].isSolid = true;
-	tiles[chaoesq].id = chaoesq;
+	tiles[chaoce].isSolid = true;
+	tiles[chaoce].id = chaoce;
 
-	tiles[chaomeio].isSolid = true;
-	tiles[chaomeio].id = chaomeio;
+	tiles[chaoc].isSolid = true;
+	tiles[chaoc].id = chaoc;
 
-	tiles[chaodir].isSolid = true;
-	tiles[chaodir].id = chaodir;
+	tiles[chaocd].isSolid = true;
+	tiles[chaocd].id = chaocd;
 
-	tiles[chao].isSolid = true;
-	tiles[chao].id = chao;
+	tiles[chao1wt].isSolid = true;
+	tiles[chao1wt].id = chao1wt;
+
+	tiles[chaome].isSolid = true;
+	tiles[chaome].id = chaome;
+
+	tiles[chaom].isSolid = true;
+	tiles[chaom].id = chaom;
+	
+	tiles[chaomd].isSolid = true;
+	tiles[chaomd].id = chaomd;
+	
+	tiles[chao1wm].isSolid = true;
+	tiles[chao1wm].id = chao1wm;
+
+	tiles[chaobe].isSolid = true;
+	tiles[chaobe].id = chaobe;
+	
+	tiles[chaob].isSolid = true;
+	tiles[chaob].id = chaob;
+	
+	tiles[chaobd].isSolid = true;
+	tiles[chaobd].id = chaobd;
+	
+	tiles[chao1wb].isSolid = true;
+	tiles[chao1wb].id = chao1wb;
+	
+	tiles[chao1he].isSolid = true;
+	tiles[chao1he].id = chao1he;
+	
+	tiles[chao1hm].isSolid = true;
+	tiles[chao1hm].id = chao1hm;
+	
+	tiles[chao1hd].isSolid = true;
+	tiles[chao1hd].id = chao1hd;
+
+	tiles[chaounico].isSolid = true;
+	tiles[chaounico].id = chaounico;
 
 	stage[backgroundL1] = al_load_bitmap("Img/backgroundL1.png");
 	stage[backgroundL2] = al_load_bitmap("Img/backgroundL2.png");
@@ -902,6 +1026,14 @@ int main() {
 	al_convert_mask_to_alpha(playersheet, al_map_rgb(255, 0, 255));
 	enemysheet = al_load_bitmap("Img/enemysheet.png");
 	al_convert_mask_to_alpha(enemysheet, al_map_rgb(255, 0, 255));
+
+	titulo = al_load_bitmap("Img/Menu/title.png");
+	btnf1 = al_load_bitmap("Img/Menu/Nselect/lvl1.png");
+	btnf2 = al_load_bitmap("Img/Menu/Nselect/lvl2.png");
+	btnle = al_load_bitmap("Img/Menu/Nselect/editor.png");
+	btnf1S = al_load_bitmap("Img/Menu/Select/lvl1_select.png");
+	btnf2S = al_load_bitmap("Img/Menu/Select/lvl2_select.png");
+	btnleS = al_load_bitmap("Img/Menu/Select/editor_select.png");
 
 	enemySprite[antiBiotic] = al_load_bitmap("Img/bacteria.png");
 	al_convert_mask_to_alpha(enemySprite[antiBiotic], al_map_rgb(255, 0, 255));
@@ -959,45 +1091,38 @@ int main() {
 					break;
 				case ALLEGRO_KEY_ENTER:
 					switch (stageSelect) {
+					case 0:
+						levelEditor = !levelEditor;
+						break;
 					case 1:
 						spawn = semirand;
 						killCount.count = 10;
 						killCount.type = shooter;
 						menuLoop = false;
-						if (modDown && devMode) {
-							levelEditor = true;
-							gameLoop = false;
-						}
-						else {
-							gameLoop = true;
-							levelEditor = false;
+						if (!levelEditor) {
+							gameLoop = true;	
 						}
 						break;
 					case 2:
 						spawn = randpos;
 						endurance.count = 2400;
 						menuLoop = false;
-						if (modDown && devMode) {
-							levelEditor = true;
-							gameLoop = false;
-						}
-						else {
+						if (!levelEditor) {
 							gameLoop = true;
-							levelEditor = false;
 						}
 						break;
 					}
 					break;
 				case ALLEGRO_KEY_UP:
 					stageSelect--;
-					if (stageSelect < 1) {
+					if (stageSelect < 0) {
 						stageSelect = 2;
 					}
 					break;
 				case ALLEGRO_KEY_DOWN:
 					stageSelect++;
 					if (stageSelect > 2) {
-						stageSelect = 1;
+						stageSelect = 0;
 					}
 					break;
 				}
@@ -1020,30 +1145,38 @@ int main() {
 
 			if (al_is_event_queue_empty(evQueue)) {
 				al_clear_to_color(al_map_rgb(0, 0, 0));
-				if (frameCount % (FPS / 2) == 0) {
-					toggleStartText = !toggleStartText;
-				}
+				
+				al_draw_bitmap(titulo, (al_get_display_width(display) / 2) - al_get_bitmap_width(titulo) / 2, al_get_display_height(display) / 5, 0);
+
 				if (devMode) {
 					al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, 0, ALLEGRO_ALIGN_CENTER, "Dev mode!!");
 				}
-				if (toggleStartText) {
-					al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, windowHeight / 2 - 12, ALLEGRO_ALIGN_CENTER, "Select mission!!");
+
+				switch (stageSelect) {
+				case 0:
+					al_draw_bitmap(btnleS, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnleS) / 2, 2 * (al_get_display_height(display) / 5), 0);
+					al_draw_bitmap(btnf1, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf1) / 2, 3 * (al_get_display_height(display) / 5), 0);
+					al_draw_bitmap(btnf2, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf1) / 2, 4 * (al_get_display_height(display) / 5), 0);
+					break;
+				case 1:
+					al_draw_bitmap(btnle, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnle) / 2, 2 * (al_get_display_height(display) / 5), 0);
+					al_draw_bitmap(btnf1S, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf1S) / 2, 3 * (al_get_display_height(display) / 5), 0);
+					al_draw_bitmap(btnf2, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf2) / 2, 4 * (al_get_display_height(display) / 5), 0);
+					break;
+				case 2:
+					al_draw_bitmap(btnle, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnle) / 2, 2 * (al_get_display_height(display) / 5), 0);
+					al_draw_bitmap(btnf1, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf1) / 2, 3 * (al_get_display_height(display) / 5), 0);
+					al_draw_bitmap(btnf2S, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf2S) / 2, 4 * (al_get_display_height(display) / 5), 0);
+					break;
 				}
+
 				if (adv.m1) {
 					al_draw_text(font, al_map_rgb(0, 255, 0), windowWidth / 2, windowHeight / 2, ALLEGRO_ALIGN_CENTER, "1 - kill shooters");
-				}
-				else {
-					al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, windowHeight / 2, ALLEGRO_ALIGN_CENTER, "1 - kill shooters");
 				}
 
 				if (adv.m2) {
 					al_draw_text(font, al_map_rgb(0, 255, 0), windowWidth / 2, windowHeight / 2 + 1 * 12, ALLEGRO_ALIGN_CENTER, "2 - endurance");
 				}
-				else {
-					al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, windowHeight / 2 + 1 * 12, ALLEGRO_ALIGN_CENTER, "2 - endurance");
-				}
-
-				al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2 - (10 * 12), windowHeight / 2 + (stageSelect - 1) * 12, ALLEGRO_ALIGN_CENTER, "->");
 
 				al_flip_display();
 			}
@@ -1191,7 +1324,6 @@ int main() {
 						editorClick.y = player.tileY;
 					}
 				}
-
 			}
 
 			if (event.type == ALLEGRO_EVENT_TIMER) {
@@ -1250,12 +1382,12 @@ int main() {
 				case ALLEGRO_KEY_Q:
 					player.selectedWeapon--;
 					if (player.selectedWeapon < 0) {
-						player.selectedWeapon = 4;
+						player.selectedWeapon = 16;
 					}
 					break;
 				case ALLEGRO_KEY_E:
 					player.selectedWeapon++;
-					if (player.selectedWeapon > 4) {
+					if (player.selectedWeapon > 16) {
 						player.selectedWeapon = 0;
 					}
 					break;
@@ -1362,17 +1494,53 @@ int main() {
 						for (k = 0; k < mapSize; k++) {
 							if (i == gtile)	{
 								switch (tileset[gtile][j][k]) {
-								case chaoesq:
+								case chaoce:
 									al_draw_bitmap_region(tileAtlas, 0, 0, tileSize, tileSize, k * tileSize, j * tileSize, 0);
 									break;
-								case chaomeio:
-									al_draw_bitmap_region(tileAtlas, tileSize, 0, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+								case chaoc:
+									al_draw_bitmap_region(tileAtlas, 1 * tileSize, 0, tileSize, tileSize, k * tileSize, j * tileSize, 0);
 									break;
-								case chaodir:
+								case chaocd:
 									al_draw_bitmap_region(tileAtlas, 2 * tileSize, 0, tileSize, tileSize, k * tileSize, j * tileSize, 0);
 									break;
-								case chao:
+								case chao1wt:
 									al_draw_bitmap_region(tileAtlas, 3 * tileSize, 0, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chaome:
+									al_draw_bitmap_region(tileAtlas, 0 * tileSize, 1 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chaom:
+									al_draw_bitmap_region(tileAtlas, 1 * tileSize, 1 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chaomd:
+									al_draw_bitmap_region(tileAtlas, 2 * tileSize, 1 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chao1wm:
+									al_draw_bitmap_region(tileAtlas, 3 * tileSize, 1 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chaobe:
+									al_draw_bitmap_region(tileAtlas, 0 * tileSize, 2 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chaob:
+									al_draw_bitmap_region(tileAtlas, 1 * tileSize, 2 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chaobd:
+									al_draw_bitmap_region(tileAtlas, 2 * tileSize, 2 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chao1wb:
+									al_draw_bitmap_region(tileAtlas, 3 * tileSize, 2 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chao1he:
+									al_draw_bitmap_region(tileAtlas, 0 * tileSize, 3 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chao1hm:
+									al_draw_bitmap_region(tileAtlas, 1 * tileSize, 3 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chao1hd:
+									al_draw_bitmap_region(tileAtlas, 2 * tileSize, 3 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chaounico:
+									al_draw_bitmap_region(tileAtlas, 3 * tileSize, 3 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
 									break;
 								}
 							}
@@ -1412,16 +1580,52 @@ int main() {
 					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = air");
 					break;
 				case 1:
-					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chaoesq");
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chao superior esquerdo");
 					break;
 				case 2:
-					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chaomeio");
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chao superior");
 					break;
 				case 3:
-					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chaodir");
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chao superior direito");
 					break;
 				case 4:
-					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chao");
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chao superior (1 wide)");
+					break;
+				case 5:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chao meio esquerdo");
+					break;
+				case 6:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chao meio");
+					break;
+				case 7:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chao meio direito");
+					break;
+				case 8:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chao meio (1 wide)");
+					break;
+				case 9:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chao inferior esquerdo");
+						break;
+				case 10:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chao inferior");
+					break;
+				case 11:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chao inferior direito");
+					break;
+				case 12:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chao inferior (1 wide)");
+					break;
+				case 13:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chao esquerdo (1 high)");
+					break;
+				case 14:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chao meio (1 high)");
+					break;
+				case 15:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chao direito (1 high)");
+					break;
+				case 16:
+					al_draw_text(font, al_map_rgb(255, 255, 255), 10, 28, 0, "Selected Tile = chao 1x1");
 					break;
 				}
 
@@ -1602,7 +1806,6 @@ int main() {
 					if (player.onGround) {
 						al_play_sample(sfx_jump, 0.25, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
 						player.vel_y = -8;
-						player.y--;
 						player.onGround = false;
 					}
 					break;
@@ -1622,18 +1825,17 @@ int main() {
 						player.selectedWeapon = 2;
 					}
 					break;
-				case ALLEGRO_KEY_S:
+				case ALLEGRO_KEY_D:
 					player.selectedWeapon++;
 					if (player.selectedWeapon > 2) {
 						player.selectedWeapon = 0;
 					}
 					break;
-				case ALLEGRO_KEY_X:
+				case ALLEGRO_KEY_SPACE:
 					al_play_sample(shot, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
 					if (projectileCount < projectileMax) {
 						for (i = 0; i < projectileMax; i++) {
 							if (!playerShot[i].projectileTravel) {
-
 								projectileCount++;
 								player.spriteChange = 0;
 								pShoot(&playerShot[i], &player);
@@ -1702,74 +1904,98 @@ int main() {
 						for (k = 0; k < mapSize; k++) {
 							if (i == gtile) {
 								switch (tileset[gtile][j][k]) {
-								case chaoesq:
+								case chaoce:
 									al_draw_bitmap_region(tileAtlas, 0, 0, tileSize, tileSize, k * tileSize, j * tileSize, 0);
 									break;
-								case chaomeio:
-									al_draw_bitmap_region(tileAtlas, tileSize, 0, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+								case chaoc:
+									al_draw_bitmap_region(tileAtlas, 1 * tileSize, 0, tileSize, tileSize, k * tileSize, j * tileSize, 0);
 									break;
-								case chaodir:
+								case chaocd:
 									al_draw_bitmap_region(tileAtlas, 2 * tileSize, 0, tileSize, tileSize, k * tileSize, j * tileSize, 0);
 									break;
-								case chao:
+								case chao1wt:
 									al_draw_bitmap_region(tileAtlas, 3 * tileSize, 0, tileSize, tileSize, k * tileSize, j * tileSize, 0);
 									break;
+								case chaome:
+									al_draw_bitmap_region(tileAtlas, 0 * tileSize, 1 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chaom:
+									al_draw_bitmap_region(tileAtlas, 1 * tileSize, 1 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chaomd:
+									al_draw_bitmap_region(tileAtlas, 2 * tileSize, 1 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chao1wm:
+									al_draw_bitmap_region(tileAtlas, 3 * tileSize, 1 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chaobe:
+									al_draw_bitmap_region(tileAtlas, 0 * tileSize, 2 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chaob:
+									al_draw_bitmap_region(tileAtlas, 1 * tileSize, 2 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chaobd:
+									al_draw_bitmap_region(tileAtlas, 2 * tileSize, 2 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chao1wb:
+									al_draw_bitmap_region(tileAtlas, 3 * tileSize, 2 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chao1he:
+									al_draw_bitmap_region(tileAtlas, 0 * tileSize, 3 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chao1hm:
+									al_draw_bitmap_region(tileAtlas, 1 * tileSize, 3 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chao1hd:
+									al_draw_bitmap_region(tileAtlas, 2 * tileSize, 3 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
+								case chaounico:
+									al_draw_bitmap_region(tileAtlas, 3 * tileSize, 3 * tileSize, tileSize, tileSize, k * tileSize, j * tileSize, 0);
+									break;
 								}
+							}
+						}
+					}
+				}
+				if (!player.immortality || (frameCount - immortalityFC) / 12 % 2 == 0) {
+					if (player.currentDir == Right) {
+						if (!player.isShooting) {
+							if ((runCycle / 7) % 2 == 0) {
+								al_draw_bitmap_region(playersheet, 0, 0, 48, 48, player.x, player.y, ALLEGRO_FLIP_HORIZONTAL);
 							}
 							else {
-								switch (tileset[ftile][j][k]) {
-								case espawn:
-									al_draw_text(font, al_map_rgb(0, 0, 0), k * tileSize + tileSize / 2, j * tileSize, 0, "E");
-									break;
-								case pspawn:
-									al_draw_text(font, al_map_rgb(0, 0, 0), k * tileSize + tileSize / 2, j * tileSize, 0, "P");
-									break;
-								case finish:
-									al_draw_text(font, al_map_rgb(0, 0, 0), k * tileSize + tileSize / 2, j * tileSize, 0, "F");
-									break;
-								}
+								al_draw_bitmap_region(playersheet, 48, 0, 48, 48, player.x, player.y, ALLEGRO_FLIP_HORIZONTAL);
 							}
 						}
-					}
-				}
-
-				if (player.currentDir == Right) {
-					if (!player.isShooting) {
-						if ((runCycle / 7) % 2 == 0) {
-							al_draw_bitmap_region(playersheet, 0, 0, 48, 48, player.x, player.y, ALLEGRO_FLIP_HORIZONTAL);
-						}
 						else {
-							al_draw_bitmap_region(playersheet, 48, 0, 48, 48, player.x, player.y, ALLEGRO_FLIP_HORIZONTAL);
+							if ((runCycle / 7) % 2 == 0) {
+								al_draw_bitmap_region(playersheet, 0, 48, 48, 48, player.x, player.y, ALLEGRO_FLIP_HORIZONTAL);
+							}
+							else {
+								al_draw_bitmap_region(playersheet, 48, 48, 48, 48, player.x, player.y, ALLEGRO_FLIP_HORIZONTAL);
+							}
 						}
+						al_draw_filled_rectangle(player.hbX, player.hbY, player.hbX + player.hbWidth, player.hbY + player.hbHeight, al_map_rgba(0, 0, 255, 50));
 					}
 					else {
-						if ((runCycle / 7) % 2 == 0) {
-							al_draw_bitmap_region(playersheet, 0, 48, 48, 48, player.x, player.y, ALLEGRO_FLIP_HORIZONTAL);
+						if (!player.isShooting) {
+							if ((runCycle / 7) % 2 == 0) {
+								al_draw_bitmap_region(playersheet, 0, 0, 48, 48, player.x, player.y, 0);
+							}
+							else {
+								al_draw_bitmap_region(playersheet, 48, 0, 48, 48, player.x, player.y, 0);
+							}
 						}
 						else {
-							al_draw_bitmap_region(playersheet, 48, 48, 48, 48, player.x, player.y, ALLEGRO_FLIP_HORIZONTAL);
+							if ((runCycle / 7) % 2 == 0) {
+								al_draw_bitmap_region(playersheet, 0, 48, 48, 48, player.x, player.y, 0);
+							}
+							else {
+								al_draw_bitmap_region(playersheet, 48, 48, 48, 48, player.x, player.y, 0);
+							}
 						}
+						al_draw_filled_rectangle(player.hbX, player.hbY, player.hbX + player.hbWidth, player.hbY + player.hbHeight, al_map_rgba(0, 0, 255, 50));
 					}
-					//al_draw_filled_rectangle(player.hbX, player.hbY, player.hbX + player.hbWidth, player.hbY + player.hbHeight, al_map_rgba(0, 0, 255, 50));
-				}
-				else {
-					if (!player.isShooting) {
-						if ((runCycle / 7) % 2 == 0) {
-							al_draw_bitmap_region(playersheet, 0, 0, 48, 48, player.x, player.y, 0);
-						}
-						else {
-							al_draw_bitmap_region(playersheet, 48, 0, 48, 48, player.x, player.y, 0);
-						}
-					}
-					else {
-						if ((runCycle / 7) % 2 == 0) {
-							al_draw_bitmap_region(playersheet, 0, 48, 48, 48, player.x, player.y, 0);
-						}
-						else {
-							al_draw_bitmap_region(playersheet, 48, 48, 48, 48, player.x, player.y, 0);
-						}
-					}
-					//al_draw_filled_rectangle(player.hbX, player.hbY, player.hbX + player.hbWidth, player.hbY + player.hbHeight, al_map_rgba(0, 0, 255, 50));
 				}
 
 				for (i = 0; i < enemyMax; i++) {
@@ -1813,7 +2039,6 @@ int main() {
 						}
 					}
 				}
-
 
 				for (i = 0; i < enemyProjectileMax; i++) {
 					if (enemyShot[i].projectileTravel) {
@@ -1885,12 +2110,14 @@ int main() {
 		}
 	}
 
-	al_destroy_timer(timer);
 	al_destroy_display(display);
-	al_destroy_font(font);
+	al_destroy_event_queue(evQueue);
 	al_uninstall_keyboard();
 	al_uninstall_mouse();
 	al_destroy_bitmap(playersheet);
+	al_destroy_bitmap(enemysheet);
+	al_destroy_bitmap(tileAtlas);
+	al_destroy_bitmap(enemyShooterSprite);
 	al_destroy_bitmap(enemySprite[antiBiotic]);
 	al_destroy_bitmap(enemySprite[antiMycotic]);
 	al_destroy_bitmap(enemySprite[antiVirus]);
@@ -1901,9 +2128,28 @@ int main() {
 	al_destroy_bitmap(playerShotTemplate[0]);
 	al_destroy_bitmap(playerShotTemplate[1]);
 	al_destroy_bitmap(enemyShotTemplate);
+	al_destroy_bitmap(titulo);
+	al_destroy_bitmap(btnf1);
+	al_destroy_bitmap(btnf2);
+	al_destroy_bitmap(btnle);
+	al_destroy_bitmap(btnf1S);
+	al_destroy_bitmap(btnf2S);
+	al_destroy_bitmap(btnleS);
+	al_destroy_timer(timer);
 	al_destroy_sample(bgm1);
+	al_destroy_sample(bgm2);
+	al_destroy_sample(bgm3);
+	al_destroy_sample(sfx_select);
+	al_destroy_sample(shot);
+	al_destroy_sample(sfx_jump);
+	al_destroy_sample(sfx_sp1);
+	al_destroy_sample(sfx_sp2);
+	al_destroy_sample(sfx_sp3);
+	al_destroy_sample(sfx_hit);
+	al_destroy_sample_instance(sampleInstance);
+	al_destroy_font(font);
 	free(tileset);
-
+	
 	return 0;
 }
 
