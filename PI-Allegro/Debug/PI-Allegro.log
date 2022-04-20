@@ -1,16 +1,16 @@
 ﻿  PI-Allegro.c
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(223,13): warning C4013: 'sodium_init' undefined; assuming extern returning int
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(269,6): warning C4101: 'i': unreferenced local variable
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(375,42): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(442,31): warning C4047: 'function': 'int' differs in levels of indirection from 'ALLEGRO_BITMAP *[3]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(442,31): warning C4024: 'enemyRandomizer': different types for formal and actual parameter 2
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(616,63): warning C4101: 'ctID': unreferenced local variable
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1053,21): warning C4047: 'function': 'entity *' differs in levels of indirection from 'entity (*)[10]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1053,21): warning C4024: 'resetEnemy': different types for formal and actual parameter 1
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1053,33): warning C4047: 'function': 'projectile *' differs in levels of indirection from 'projectile (*)[25]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1053,33): warning C4024: 'resetEnemy': different types for formal and actual parameter 2
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1734,42): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1734,42): warning C4024: 'initenemya': different types for formal and actual parameter 2
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1781,42): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
-C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\PI-Allegro.c(1781,42): warning C4024: 'initenemya': different types for formal and actual parameter 2
-  PI-Allegro.vcxproj -> C:\Users\keeee\source\repos\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(228,13): warning C4013: 'sodium_init' undefined; assuming extern returning int
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(274,6): warning C4101: 'i': unreferenced local variable
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(380,42): warning C4013: 'randombytes_uniform' undefined; assuming extern returning int
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(447,31): warning C4047: 'function': 'int' differs in levels of indirection from 'ALLEGRO_BITMAP *[3]'
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(447,31): warning C4024: 'enemyRandomizer': different types for formal and actual parameter 2
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(621,63): warning C4101: 'ctID': unreferenced local variable
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(1064,21): warning C4047: 'function': 'entity *' differs in levels of indirection from 'entity (*)[10]'
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(1064,21): warning C4024: 'resetEnemy': different types for formal and actual parameter 1
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(1064,33): warning C4047: 'function': 'projectile *' differs in levels of indirection from 'projectile (*)[25]'
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(1064,33): warning C4024: 'resetEnemy': different types for formal and actual parameter 2
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(1822,42): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(1822,42): warning C4024: 'initenemya': different types for formal and actual parameter 2
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(1869,42): warning C4047: 'function': 'ALLEGRO_BITMAP **' differs in levels of indirection from 'ALLEGRO_BITMAP *(*)[3]'
+C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\PI-Allegro.c(1869,42): warning C4024: 'initenemya': different types for formal and actual parameter 2
+  PI-Allegro.vcxproj -> C:\Users\Felipe\source\repos\PI-Allegro\PI-Allegro\PI-Allegro\Debug\PI-Allegro.exe

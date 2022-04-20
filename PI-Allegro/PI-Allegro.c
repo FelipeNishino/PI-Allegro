@@ -11,8 +11,8 @@
 #include <allegro5/allegro_primitives.h>
 
 #define FPS 60
-#define windowWidth 1440
-#define windowHeight 900
+#define windowWidth 1366
+#define windowHeight 768
 #define worldWidth 1000
 #define worldHeight 1000
 
@@ -24,7 +24,7 @@
 #define projectileDamage 10
 #define targetPracticeLife 20
 #define enemyMax 10
-#define enemyProjectileVelocity 4
+#define enemyProjectileVelocity 3
 #define enemyProjectileOffset 10
 #define enemyProjectileMax 25
 #define enemyProjectileDamage 10
@@ -202,6 +202,11 @@ ALLEGRO_BITMAP* btnle;
 ALLEGRO_BITMAP* btnf1S;
 ALLEGRO_BITMAP* btnf2S;
 ALLEGRO_BITMAP* btnleS;
+ALLEGRO_BITMAP* hist;
+ALLEGRO_BITMAP* control;
+ALLEGRO_BITMAP* antiv;
+ALLEGRO_BITMAP* antib;
+ALLEGRO_BITMAP* antim;
 ALLEGRO_FILE* txtmap;
 ALLEGRO_TRANSFORM camera;
 FILE* tm;
@@ -752,6 +757,7 @@ void resetEnemy(entity e[], projectile p[]) {
 	
 	for (i = 0; i < enemyMax; i++) {
 		e[i].alive = false;
+		e[i].x = 0;
 	}
 }
 
@@ -951,12 +957,12 @@ void createTileAtlas(void) {
 }
 
 int main() {
-	int spawntimeout = 0, i, j, k, l = 0, projectileCount = 0, stageSelect = 1, enemyProjectileCount = 0, enemySpawnTileCount = 0, enemyDmgGauge = 0, hit = 0, hitI[2] = { 0, 0 }, hitII = 0, tilefunc = 0, frameCount = 0, immortalityFC = 0, enemyDeadFC[enemyMax] = { 0, 0 }, runCycle = 0, spawn;
+	int entcount = 0, spawntimeout = 0, i, j, k, l = 0, projectileCount = 0, stageSelect = 1, enemyProjectileCount = 0, enemySpawnTileCount = 0, enemyDmgGauge = 0, hit = 0, hitI[2] = { 0, 0 }, hitII = 0, tilefunc = 0, frameCount = 0, immortalityFC = 0, enemyDeadFC[enemyMax] = { 0, 0 }, runCycle = 0, spawn;
 	int *eSTx, *eSTy;
 	int*** tileset = NULL;
 	float cx = 0, cy = 0;
 	char mousePos[25] = "", debugInput[2] = "", debugTest[6] = "debug", enemyLifeGauge[5], ptx[8], pty[8], objText[25];
-	bool gameLoop = false, menuLoop = true, toggleStartText = false, exit = false, devMode = false, modDown = false, levelEditor = false, exitStage = false;
+	bool gameLoop = false, menuLoop = true, stageLoop = false, toggleStartText = false, exit = false, devMode = false, modDown = false, levelEditor = false, exitStage = false;
 	bool* checkspawn;
 	queue devChecker;
 
@@ -1034,6 +1040,11 @@ int main() {
 	btnf1S = al_load_bitmap("Img/Menu/Select/lvl1_select.png");
 	btnf2S = al_load_bitmap("Img/Menu/Select/lvl2_select.png");
 	btnleS = al_load_bitmap("Img/Menu/Select/editor_select.png");
+	hist = al_load_bitmap("Img/Menu/TelasProntas/TelaContexto.png");
+	control = al_load_bitmap("Img/Menu/TelasProntas/TelaControle.png");
+	antiv = al_load_bitmap("Img/Menu/TelasProntas/antiv.png");
+	antib = al_load_bitmap("Img/Menu/TelasProntas/antib.png");
+	antim = al_load_bitmap("Img/Menu/TelasProntas/antim.png");
 
 	enemySprite[antiBiotic] = al_load_bitmap("Img/bacteria.png");
 	al_convert_mask_to_alpha(enemySprite[antiBiotic], al_map_rgb(255, 0, 255));
@@ -1052,9 +1063,38 @@ int main() {
 			al_play_sample(bgm1, 1, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
 			resetEnemy(&enemy, &enemyShot);
 			exitStage = !exitStage;
+			spawntimeout = 0;
 		}
 
 		while (menuLoop) {
+			ALLEGRO_EVENT event;
+			al_wait_for_event(evQueue, &event);
+
+			if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+				if (event.keyboard.keycode == ALLEGRO_KEY_ENTER) {
+					entcount++;
+
+					if (entcount == 2) {
+						stageLoop = true;
+						menuLoop = false;
+					}
+				}
+			}
+
+			al_clear_to_color(al_map_rgb(0, 0, 0));
+
+			if (entcount == 0 ) {
+				al_draw_bitmap(titulo, (al_get_display_width(display) / 2) - al_get_bitmap_width(titulo) / 2, al_get_display_height(display) / 5, 0);
+				al_draw_text(font, al_map_rgb(255, 255, 255), (al_get_display_width(display) / 2), 2 * (al_get_display_height(display) / 5), ALLEGRO_ALIGN_CENTER, "Aperte Enter");
+			}
+			if (entcount == 1) {
+				//al_draw_bitmap(hist, (al_get_display_width(display) / 2) - al_get_bitmap_width(hist) / 2, al_get_display_height(display) / 2 - al_get_bitmap_width(hist) / 2, 0);
+				al_draw_bitmap(hist,  120, 0, 0);
+			}
+			al_flip_display();
+		}
+
+		while (stageLoop) {
 			ALLEGRO_EVENT event;
 			al_wait_for_event(evQueue, &event);
 
@@ -1098,7 +1138,7 @@ int main() {
 						spawn = semirand;
 						killCount.count = 10;
 						killCount.type = shooter;
-						menuLoop = false;
+						stageLoop = false;
 						if (!levelEditor) {
 							gameLoop = true;	
 						}
@@ -1106,7 +1146,7 @@ int main() {
 					case 2:
 						spawn = randpos;
 						endurance.count = 2400;
-						menuLoop = false;
+						stageLoop = false;
 						if (!levelEditor) {
 							gameLoop = true;
 						}
@@ -1137,7 +1177,7 @@ int main() {
 			if (event.type == ALLEGRO_EVENT_TIMER) {
 				frameCount++;
 			}
-			exitGame(event, &menuLoop, &exit);
+			exitGame(event, &stageLoop, &exit);
 
 			if (event.type == ALLEGRO_EVENT_DISPLAY_RESIZE) {
 				al_acknowledge_resize(display);
@@ -1148,35 +1188,76 @@ int main() {
 				
 				al_draw_bitmap(titulo, (al_get_display_width(display) / 2) - al_get_bitmap_width(titulo) / 2, al_get_display_height(display) / 5, 0);
 
-				if (devMode) {
+				/*if (devMode) {
 					al_draw_text(font, al_map_rgb(255, 255, 255), windowWidth / 2, 0, ALLEGRO_ALIGN_CENTER, "Dev mode!!");
-				}
+				}*/
 
 				switch (stageSelect) {
 				case 0:
 					al_draw_bitmap(btnleS, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnleS) / 2, 2 * (al_get_display_height(display) / 5), 0);
-					al_draw_bitmap(btnf1, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf1) / 2, 3 * (al_get_display_height(display) / 5), 0);
-					al_draw_bitmap(btnf2, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf1) / 2, 4 * (al_get_display_height(display) / 5), 0);
+					if (!adv.m1) {
+						al_draw_bitmap(btnf1, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf1) / 2, 3 * (al_get_display_height(display) / 5), 0);
+					}
+					else {
+						al_draw_tinted_bitmap(btnf1, al_map_rgb(0, 255, 0), (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf1) / 2, 3 * (al_get_display_height(display) / 5), 0);
+					}
+					if (!adv.m2) {
+						al_draw_bitmap(btnf2, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf2) / 2, 4 * (al_get_display_height(display) / 5), 0);
+					}
+					else {
+						al_draw_tinted_bitmap(btnf2, al_map_rgb(0, 255, 0), (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf2) / 2, 3 * (al_get_display_height(display) / 5), 0);
+					}
+					//al_draw_text(font, al_map_rgb(255, 255, 255), (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf2S) / 2, 2 * (al_get_display_height(display) / 5), 0, "->");
 					break;
 				case 1:
-					al_draw_bitmap(btnle, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnle) / 2, 2 * (al_get_display_height(display) / 5), 0);
-					al_draw_bitmap(btnf1S, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf1S) / 2, 3 * (al_get_display_height(display) / 5), 0);
-					al_draw_bitmap(btnf2, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf2) / 2, 4 * (al_get_display_height(display) / 5), 0);
+					if (!levelEditor) {
+						al_draw_bitmap(btnle, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnle) / 2, 2 * (al_get_display_height(display) / 5), 0);
+					}
+					else {
+						al_draw_tinted_bitmap(btnle, al_map_rgb(255, 200, 0), (al_get_display_width(display) / 2) - al_get_bitmap_width(btnle) / 2, 2 * (al_get_display_height(display) / 5), 0);
+					}
+					if (!adv.m1) {
+						al_draw_bitmap(btnf1S, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf1S) / 2, 3 * (al_get_display_height(display) / 5), 0);
+					}
+					else {
+						al_draw_tinted_bitmap(btnf1, al_map_rgb(0, 255, 0), (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf1) / 2, 3 * (al_get_display_height(display) / 5), 0);
+					}
+					if (!adv.m2) {
+						al_draw_bitmap(btnf2, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf2) / 2, 4 * (al_get_display_height(display) / 5), 0);
+					}
+					else {
+						al_draw_tinted_bitmap(btnf2, al_map_rgb(0, 255, 0), (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf2) / 2, 3 * (al_get_display_height(display) / 5), 0);
+					}
+					//al_draw_text(font, al_map_rgb(255, 255, 255), (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf2S) / 2, 3 * (al_get_display_height(display) / 5), 0, "->");
 					break;
 				case 2:
-					al_draw_bitmap(btnle, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnle) / 2, 2 * (al_get_display_height(display) / 5), 0);
-					al_draw_bitmap(btnf1, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf1) / 2, 3 * (al_get_display_height(display) / 5), 0);
-					al_draw_bitmap(btnf2S, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf2S) / 2, 4 * (al_get_display_height(display) / 5), 0);
+					if (!levelEditor) {
+						al_draw_bitmap(btnle, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnle) / 2, 2 * (al_get_display_height(display) / 5), 0);
+					}
+					else {
+						al_draw_tinted_bitmap(btnle, al_map_rgb(255, 200, 0), (al_get_display_width(display) / 2) - al_get_bitmap_width(btnle) / 2, 2 * (al_get_display_height(display) / 5), 0);
+					}
+					if (!adv.m1) {
+						al_draw_bitmap(btnf1, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf1) / 2, 3 * (al_get_display_height(display) / 5), 0);
+					}
+					else {
+						al_draw_tinted_bitmap(btnf1, al_map_rgb(0, 255, 0), (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf1) / 2, 3 * (al_get_display_height(display) / 5), 0);
+					}
+					if (!adv.m2) {
+						al_draw_bitmap(btnf2S, (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf2S) / 2, 4 * (al_get_display_height(display) / 5), 0);
+					}
+					else {
+						al_draw_tinted_bitmap(btnf2, al_map_rgb(0, 255, 0), (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf2) / 2, 3 * (al_get_display_height(display) / 5), 0);
+					}
+					//al_draw_text(font, al_map_rgb(255, 255, 255), (al_get_display_width(display) / 2) - al_get_bitmap_width(btnf2S) / 2, 4 * (al_get_display_height(display) / 5), 0, "->");
 					break;
 				}
 
-				if (adv.m1) {
-					al_draw_text(font, al_map_rgb(0, 255, 0), windowWidth / 2, windowHeight / 2, ALLEGRO_ALIGN_CENTER, "1 - kill shooters");
-				}
+				al_draw_bitmap(antiv, 10, 350, 0);
 
-				if (adv.m2) {
-					al_draw_text(font, al_map_rgb(0, 255, 0), windowWidth / 2, windowHeight / 2 + 1 * 12, ALLEGRO_ALIGN_CENTER, "2 - endurance");
-				}
+				al_draw_bitmap(antib, 10, 480, 0);
+
+				al_draw_bitmap(antim, 940, 350, 0);
 
 				al_flip_display();
 			}
@@ -1220,6 +1301,13 @@ int main() {
 		}
 
 		initplayer(&player, playersheet, &enemySpawnTileCount, tileset);
+
+		if (levelEditor) {
+			player.vel_x = 0;
+		}
+		else {
+			player.vel_x = 4.5;
+		}
 
 		eSTx = malloc(enemySpawnTileCount * sizeof(int));
 		eSTy = malloc(enemySpawnTileCount * sizeof(int));
@@ -1715,7 +1803,7 @@ int main() {
 
 				if (player.life <= 0) {
 					player.alive = false;
-					menuLoop = true;
+					stageLoop = true;
 					gameLoop = false;
 					exitStage = true;
 				}
@@ -1769,7 +1857,7 @@ int main() {
 					}
 					if (killCount.count == 0) {
 						adv.m1 = true;
-						menuLoop = true;
+						stageLoop = true;
 						gameLoop = false;
 						exitStage = true;
 					}
@@ -1785,7 +1873,7 @@ int main() {
 					}
 					if (endurance.count == 0) {
 						adv.m2 = true;
-						menuLoop = true;
+						stageLoop = true;
 						gameLoop = false;
 						exitStage = true;
 					}
@@ -1975,7 +2063,7 @@ int main() {
 								al_draw_bitmap_region(playersheet, 48, 48, 48, 48, player.x, player.y, ALLEGRO_FLIP_HORIZONTAL);
 							}
 						}
-						al_draw_filled_rectangle(player.hbX, player.hbY, player.hbX + player.hbWidth, player.hbY + player.hbHeight, al_map_rgba(0, 0, 255, 50));
+						//al_draw_filled_rectangle(player.hbX, player.hbY, player.hbX + player.hbWidth, player.hbY + player.hbHeight, al_map_rgba(0, 0, 255, 50));
 					}
 					else {
 						if (!player.isShooting) {
@@ -1994,7 +2082,7 @@ int main() {
 								al_draw_bitmap_region(playersheet, 48, 48, 48, 48, player.x, player.y, 0);
 							}
 						}
-						al_draw_filled_rectangle(player.hbX, player.hbY, player.hbX + player.hbWidth, player.hbY + player.hbHeight, al_map_rgba(0, 0, 255, 50));
+						//al_draw_filled_rectangle(player.hbX, player.hbY, player.hbX + player.hbWidth, player.hbY + player.hbHeight, al_map_rgba(0, 0, 255, 50));
 					}
 				}
 
@@ -2135,6 +2223,8 @@ int main() {
 	al_destroy_bitmap(btnf1S);
 	al_destroy_bitmap(btnf2S);
 	al_destroy_bitmap(btnleS);
+	al_destroy_bitmap(hist);
+	al_destroy_bitmap(control);
 	al_destroy_timer(timer);
 	al_destroy_sample(bgm1);
 	al_destroy_sample(bgm2);
